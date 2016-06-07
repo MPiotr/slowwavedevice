@@ -1,0 +1,146 @@
+load "Element_Mixte"
+load "Element_P3"
+
+	mesh Th;
+	real R1, R2, Rmin, amp, high, low;
+	real w, omegaP, beta0, Ltr;
+	bool ifPlot;
+	real d = 1.1;
+
+	ofstream file("_Ez.csv");
+	ofstream frefile("F:\\Piotr\\CalcData\\twt_data\\W_bwo_FoldWg_4\\dispFem.csv");
+
+  // if(R2  == R1) continue; //1.108; 1.121
+
+for(real h = 0; h <= pi/d; h+=pi/(d*30.))
+{
+     R1 = 0.28*0.5;
+     R2 = 0.5*1.78;//2.2;8;
+     d = 0.7;
+	 real tthwide = 0.175;
+	 real grvwide = d - tthwide;
+     real beamheight = 0.176;
+	 omegaP = 0.005;
+	 beta0 = 0.7;
+	 Ltr = 1.78;
+     ifPlot = false;
+
+     real ymin = -0.5*beamheight;
+	 real ymax =  0.5*beamheight;
+   
+
+  // if(R2  == R1) continue; //1.108; 1.121
+
+
+   cout<<R1<<"________"<<R2<<"\n";		
+
+  cout<<R1<<"________"<<R2<<"\n";		
+
+   
+   border G11(t = 0, 0.5*grvwide)  		   		   {x = t;     			 y = R2;    label = 1;}
+   border G12(t = R2, R1)					       {x = 0.5*grvwide; 	 y = t;     label = 1;}
+   border G13(t = 0.5*grvwide, d - 0.5*grvwide )   {x = t;      		 y = R1; 	label = 1;}  
+   border G14(t = R1,R2)                           {x = d-0.5*grvwide;	 y = t;   	label = 1;}
+   border G15(t = d - 0.5*grvwide, d)              {x = t;     			 y = R2; 	label = 1;}
+
+   border G2(t = R2, -R1)  {x = d; y = t; label = 2;}
+
+   border G31(t = 0, 0.5*tthwide)                    {x = t;      		  	 y = -R1; label = 1;}
+   border G32(t = -R1,-R2)                           {x = 0.5*tthwide;		 y = t;   label = 1;}
+   border G33(t = 0.5*tthwide,(d-0.5*tthwide))       {x = t; 			     y = -R2; label = 1;}  
+   border G34(t = -R2,-R1)            				 {x = (d-0.5*tthwide);	 y = t;   label = 1;}
+   border G35(t = (d-0.5*tthwide), d)            	 {x = t;      			 y = -R1; label = 1;}
+       
+   border G4(t = -R1, R2)  {x = 0; y = t;  label = 4;}
+
+   int n = 2 + ceil(abs(R2-R1)/0.06);
+   int NN = 20;
+
+   Th = buildmesh(G11(-NN*1.5)+G12(-n*1.5)+G13(-NN*1.5)+G14(-n*1.5)+G15(-NN*1.5)
+				 + G2(-NN)
+   				 + G31(NN*1.5)+G32(n*1.5)+G33(NN*1.5)+G34(n*1.5)+G35(NN*1.5)
+				 + G4(-NN));
+
+	int[int] old2new (0:Th.nv-1);
+    fespace VTh (Th, P1);
+    VTh sortorder = x+y;
+    sort(sortorder[], old2new);
+    int[int] new2old = old2new^(-1);
+    
+     Th = change(Th, renumv = new2old);
+
+//plot(Th, cmm = "mesh");
+
+fespace Vh(Th,[RT1Ortho, P2],  periodic = [[2,y], [4, y]]); // finite element space
+
+//Vh<complex> [ux,uy],[vx,vy];
+
+matrix<complex> OP, B;
+
+int nev = 7;
+real m = 1;
+//real h = pi/d;//0.01
+real sigma=7;//
+m = pi/Ltr;
+complex[int] ev(nev);
+Vh<complex>[int] [eVz, eVr, eVphi](nev);
+
+//m = 0;
+
+varf b([Hz,Hr, Hphi],[vHz,vHr, vHphi]) = int2d(Th)(conj(vHr)*Hr+conj(vHphi)*Hphi+conj(vHz)*Hz);
+
+macro odx(F) (dx(F) +  1i*h*F) //
+macro odxc(F) (dx(F) - 1i*h*F) //
+    
+B = b(Vh, Vh,  solver=UMFPACK);
+
+varf op([Hz,Hx, Hy],[vHz,vHx, vHy]) = 
+int2d(Th)(
+
+(
+	 (dy(Hy) + m*Hx )*conj(dy(vHy)+ m*vHx ) 	//rot_z
+ +   (odx(Hx) - dy(Hz))*conj(odx(vHx) - dy(vHz))		 	//rot_phi
+ +   (-m*Hz  - odx(Hy))*conj(-m*vHz  - odx(vHy))    //rot_r
+
+)
+-(sigma)*(conj(vHx)*Hx+conj(vHy)*Hy + conj(vHz)*Hz)//*exp(1i*h*x)
+         )
+
+	+ on(1, Hz = 0, Hx = 0,  Hy = 0)
+
+;
+
+
+	OP = op(Vh, Vh, solver=UMFPACK); 
+
+
+	int k = EigenValue(OP, B, nev = nev, sigma = sigma, value = ev, vector = [eVz, eVr, eVphi][0], tol=1e-4,maxit=5000,ncv=20);
+	for(int i = 0; i < nev; i++)
+		cout<<i<<"    "<<sqrt(real(ev(i)))<<"    "<<sqrt(real(ev(i)))*299.8/(2.*pi)<<"\n";
+
+/*
+for(int i = 0; i <= 299; i++)
+{ 
+	x = 0; y = 1./300.*i;
+	file<<y<<","<<real(eVz[1])<<","<<imag(eVz[1])<<"\n";
+
+}*/
+	for(int i = 0; i < nev; i++)
+	{
+		if(abs(ev(i)) > 2) frefile<<i<<","<<h<<","<<real(ev(i))<<","<<imag(ev(i))<<"\n";
+	}
+
+	if(ifPlot)
+	{
+		for(int i = 0; i <3; i++)
+		{
+			plot(eVz[i],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = i+": Ez");
+			plot(eVr[i],dim=2,fill=1, ColorScheme = 2, WindowIndex=2,cmm = i+": Er");
+			plot(eVphi[i],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = i+": Ephi");
+		}
+	}
+
+
+}
+
+

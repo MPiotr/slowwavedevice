@@ -1,0 +1,46 @@
+<xml version="1.0" encoding="ISO-8859-1">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName>folded waveguide BWO ver 2</problemName>
+  <beam>
+   <voltage iterable="0" unit="kV">20</voltage>
+   <current iterable="1" unit="A">
+    <from>0.17</from>
+    <to>0.4</to>
+    <step>0.0125</step>
+   </current>
+   <height unit="mm">0.176</height>
+   <beamStructureGap unit="mm">1e-8</beamStructureGap>
+   <beamWidth unit="mm">1.76</beamWidth>
+   <beamHeight unit="mm">0.176</beamHeight>
+   <angle>298</angle>
+  </beam>
+  <wave>
+   <!-- <frequency  unit = "GHz">101.865</frequency> ???????????????, ?.?. ??????? ???????????? ?? ???????????-->
+  </wave>
+  <cavity>
+   <LFsection>
+    <period unit="mm">0.7</period>
+    <periodNumbers iterable="0">26</periodNumbers>
+    <periodNorma>-1.</periodNorma>
+    <QFactor iterable="0">735</QFactor>
+    <structureWidth unit="mm">1.78</structureWidth>
+    <groupSpeed>-0.2338</groupSpeed>
+    <!--group speed is negative: BWO! -->
+    <fieldFileName>transField.csv</fieldFileName>
+    <dispersionFileName>dispersion.csv</dispersionFileName>
+    <logitudinalStructureFile type="filename">coupling.csv</logitudinalStructureFile>
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time>75</Time>
+   <MaxPointNumber>450</MaxPointNumber>
+   <MaxLength>350</MaxLength>
+   <solverName>twt</solverName>
+   <problemType>bwo</problemType>
+   <comment>twt_fw</comment>
+   <fileIndex>2</fileIndex>
+   <initialAmp>1.58e-5</initialAmp>
+   <initialDelta>-0.027</initialDelta>
+  </solver>
+ </xs:schema>
+</xml>

@@ -1,0 +1,39 @@
+﻿<xml version="1.0" encoding="ISO-8859-1" >
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<problemName>etalonBWO</problemName>
+<beam>
+	<voltage unit = "kV">30</voltage>
+	<current unit = "A">1.</current><!--To eliminate current and mc^3/e -->
+	<height unit = "mm">0.1</height>
+	<beamStructureGap unit = "mm">1e-8</beamStructureGap>
+	<beamWidth unit = "mm">0.1</beamWidth>
+	<beamHeight unit = "mm">0.1</beamHeight>
+	<angle>298</angle>
+</beam>
+<wave>
+    <frequency  unit = "GHz">101.865</frequency><!-- synchronism must be -->
+</wave>
+<cavity>
+	<LFsection>
+		<period unit = "mm">0.8</period>
+		<periodNumbers>30</periodNumbers>	
+		<periodNorma>3.021</periodNorma>
+		<QFactor>1920e30</QFactor>		
+		<structureWidth unit = "mm">1000.</structureWidth>
+		<groupSpeed>-0.2338</groupSpeed><!--group speed is negative: BWO! -->
+        <fieldFileName>synfield.csv</fieldFileName>
+<!--		<dispersionFileName>F:\Piotr\CalcData\twt_data\testingDisp.txt</dispersionFileName>-->
+	</LFsection>
+</cavity>
+<solver>
+	<Time>75</Time>
+	<MaxPointNumber>350</MaxPointNumber>
+	<MaxLength>250</MaxLength>
+	<solverName>twt</solverName>
+	<comment>etalon</comment>
+	<fileIndex>1</fileIndex>
+	<initialAmp>-0.00011426</initialAmp>
+	<initialDelta>-0.025654577438708092</initialDelta>
+</solver>	
+</xs:schema>
+</xml>
