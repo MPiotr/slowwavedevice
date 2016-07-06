@@ -1,0 +1,199 @@
+load "Element_Mixte"
+load "Element_P3"
+
+	mesh Th;
+	real R1, R2, Rmin, amp, high, low, d = 1., Ltr, ymin, ymax, h;
+    bool ifPlot;
+	ofstream file("Ez.csv");
+	ofstream frefile("dispersion.csv");
+    ofstream lfieldfile("lfield_2.csv");
+    ofstream fieldfile("transField.csv");
+    ofstream filefre ("_original.csv");
+
+ 
+for(int j = 0; j <= 0; j++)
+{
+     R1 = 0.28*0.5;
+     R2 = 0.5*1.78;
+     d = 0.7;
+	 real tthwide = 0.175;
+	 real grvwide = d - tthwide;
+     real beamheight = 0.176;
+       h =  (300)/180.*pi/d;
+	 Ltr = 1.78;
+     ifPlot = false;
+
+     ymin = -0.5*beamheight;
+	 ymax =  0.5*beamheight;
+
+	 int Ny = 16;
+	 int harmNum = 1;
+    
+
+  cout<<R1<<"________"<<R2<<"\n";		
+
+   
+   border G11(t = 0, 0.5*grvwide)  		   		   {x = t;     			 y = R2;    label = 1;}
+   border G12(t = R2, R1)					       {x = 0.5*grvwide; 	 y = t;     label = 1;}
+   border G13(t = 0.5*grvwide, d - 0.5*grvwide )   {x = t;      		 y = R1; 	label = 1;}  
+   border G14(t = R1,R2)                           {x = d-0.5*grvwide;	 y = t;   	label = 1;}
+   border G15(t = d - 0.5*grvwide, d)              {x = t;     			 y = R2; 	label = 1;}
+
+   border G2(t = R2, -R1)  {x = d; y = t; label = 2;}
+
+   border G31(t = 0, 0.5*tthwide)                    {x = t;      		  	 y = -R1; label = 1;}
+   border G32(t = -R1,-R2)                           {x = 0.5*tthwide;		 y = t;   label = 1;}
+   border G33(t = 0.5*tthwide,(d-0.5*tthwide))       {x = t; 			     y = -R2; label = 1;}  
+   border G34(t = -R2,-R1)            				 {x = (d-0.5*tthwide);	 y = t;   label = 1;}
+   border G35(t = (d-0.5*tthwide), d)            	 {x = t;      			 y = -R1; label = 1;}
+       
+   border G4(t = -R1, R2)  {x = 0; y = t;  label = 4;}
+
+   int n = 2 + ceil(abs(R2-R1)/0.06);
+   int NN = 20;
+
+   Th = buildmesh(G11(-NN*1.5)+G12(-n*1.5)+G13(-NN*1.5)+G14(-n*1.5)+G15(-NN*1.5)
+				 + G2(-NN)
+   				 + G31(NN*1.5)+G32(n*1.5)+G33(NN*1.5)+G34(n*1.5)+G35(NN*1.5)
+				 + G4(-NN));
+
+	int[int] old2new (0:Th.nv-1);
+    fespace VTh (Th, P1);
+    VTh sortorder = x+y;
+    sort(sortorder[], old2new);
+    int[int] new2old = old2new^(-1);
+    
+     Th = change(Th, renumv = new2old);
+
+//plot(Th, cmm = "mesh");
+
+	fespace Vh(Th,[RT1Ortho, P2],  periodic = [[2,y], [4, y]]); // finite element space
+
+//Vh<complex> [ux,uy],[vx,vy];
+
+	matrix<complex> OP, B;
+
+	int nev = 7;
+	real m = pi/Ltr;
+	//real h = pi/d;//0.01
+	real sigma= 3.5;//24.5;//7.5;//7.5;
+
+   
+	complex[int] ev(nev);
+    real[int] freq(nev);
+	Vh<complex>[int] [eVz, eVr, eVphi](nev);
+
+
+
+	varf b([Hz,Hr, Hphi],[vHz,vHr, vHphi]) = int2d(Th)(conj(vHr)*Hr+conj(vHphi)*Hphi+conj(vHz)*Hz);
+
+macro odx(F) (dx(F) +  1i*h*F) //
+macro odxc(F) (dx(F) - 1i*h*F) //
+    
+	B = b(Vh, Vh,  solver=UMFPACK);
+
+varf op([Hz,Hr, Hphi],[vHz,vHr, vHphi]) = 
+int2d(Th)(
+
+(
+	 (dy(Hphi) + m*Hr )*conj(dy(vHphi) +m*vHr ) 	//rot_z
+ +   (odx(Hr) - dy(Hz))*conj(odx(vHr) - dy(vHz))		 	//rot_phi
+ +   (-m*Hz  - odx(Hphi))*conj(-m*vHz  - odx(vHphi))    //rot_r
+
+)
+-sigma*(conj(vHr)*Hr+conj(vHphi)*Hphi + conj(vHz)*Hz)//*exp(1i*h*x)
+         )
+
+	+ on(1, 11, Hz = 0, Hr = 0, Hphi = 0)
+    + on(3, /*Hz = 0, Hr = 0,*/ Hphi = 0)
+
+;
+
+
+	OP = op(Vh, Vh, solver=UMFPACK); 
+
+
+	int k = EigenValue(OP, B, nev = nev, sigma = sigma, value = ev, vector = [eVz, eVr, eVphi][0], tol=1e-4,maxit=5000,ncv=30);
+	for(int i = 0; i < nev; i++)
+    {
+        freq(i) = sqrt(real(ev(i)))*299.8/(2.*pi);
+		cout<<i<<"    "<<sqrt(real(ev(i)))<<"    "<< freq(i)<<"\n";
+    }
+
+
+	for(int i = 0; i < nev; i++)
+	{
+		if(abs(ev(i)) > 2) frefile<<i<<","<<h<<","<<real(ev(i))<<","<<imag(ev(i))<<"\n";
+	}
+
+     if(ifPlot){
+plot(eVz[0],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Ez; f = " + freq(0));
+plot(eVr[0],dim=2,fill=1, ColorScheme = 2, WindowIndex=2,cmm = "Er; f = " + freq(0));
+plot(eVphi[0],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Ephi; f = " + freq(0));
+plot(eVz[1],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Ez; f = " + freq(1));
+plot(eVr[1],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Er; f = " + freq(1));
+plot(eVphi[1],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Ephi; f = " + freq(1));}
+
+   cout <<"\n ..................................... Results .........................................\n";
+   for(int Zzz = 0; Zzz < nev; Zzz++){
+   complex A1 = 0;
+   complex A0 = 0;
+   complex A1zero = 0;
+   real vol;
+   int N = 2000;
+  
+//   if(real(ev[Zzz]) > -1.) continue;
+	if(Zzz == 0)
+	{
+		vol = int2d(Th)   (real      (eVz[Zzz] *conj(eVz[Zzz]) + eVphi[Zzz]*conj(eVphi[Zzz]) + eVr[Zzz]*conj(eVr[Zzz])));
+		for(int iy = 0; iy <= Ny; iy ++)
+		{
+		    y = ymin + (ymax - ymin)*iy/(1.*Ny);  x = 0; 
+            A1 = 0;
+		    A0 = 0;
+		    A1 += 0.5*(eVz[Zzz])*exp(-1i*(h+(harmNum-1)*2.*pi/d)*x)*exp(1i*h*x);
+		    A0 += 0.5*(eVz[Zzz])*exp(1i*h*x);
+
+    		for(int s = 1; s < N; s++) {
+	 		     x = 1.*s/N*d;
+	      	     y = ymin + (ymax - ymin)*iy/(1.*Ny);
+    	 		 A1 += (eVz[Zzz])*exp(-1i*(h+(harmNum-1)*2.*pi/d)*x)*exp(1i*h*x);  
+		         A0 += (eVz[Zzz])*exp(1i*h*x);
+	   		}
+
+    		x = 1.*d; 
+   		    y = ymin + (ymax - ymin)*iy/(1.*Ny);
+		    A1 += 0.5*(eVz[Zzz])*exp(-1i*(h+(harmNum-1)*2.*pi/d)*x)*exp(1i*h*x); 
+		    A0 += 0.5*(eVz[Zzz])*exp(1i*h*x);
+		    A1 /= N+1.;  A0/= N+1;
+			if(y == 0) A1zero = A1;
+            cout<<y<<"......."<<A1<<"..."<<abs(A1)<<"\n";
+		    fieldfile<<y<<","<<real(A1)/sqrt((Ltr*vol/(2*4.*pi)))<<","<<imag(A1)/sqrt((Ltr*vol/(2*4.*pi)))<<"\n";
+
+		}
+
+     for(int ix = 0; ix < 200; ix++)
+	 {
+			y = 0;
+			x = ix/200.*d;
+			lfieldfile<<x<<","<<real(eVz[0]*exp(1i*h*x))<<","<<imag(eVz[0]*exp(1i*h*x))<<"\n";
+	 }
+
+	  real S = 1;
+      real betaph, betagr, gamma, nu, hfactor;
+      cout <<"_____________kappa^/N(y = 0) = "<<A1zero*conj(A1zero)/(vol*Ltr/(2*4.*pi))
+           <<"\n________________________vol = "<<vol
+           <<"\n_________________________A1 = "<<abs(A1)
+           <<"\n__________________________Q = "<<2.*vol/(sqrt(1.6*29.97/freq[Zzz])*0.4e-3*S)
+           <<"\n_____________ ____frequency = "<<freq[Zzz]<<"\n";
+      cout<<"      S/vol = "<<S/vol<<"\n";
+
+      hfactor = 0.1+0.01*0.5*sqrt((h+2*pi/d)^2- abs(ev[Zzz]));
+      filefre<<h<<","<<freq[Zzz]<<","<<real(sqrt(-ev[Zzz]))<<","<<imag(sqrt(-ev[Zzz]))<<","
+                  <<Zzz<<","<<2.*vol/(sqrt(1.6*29.97/(freq(Zzz)))*0.4e-3*S)<<","<<real(ev[Zzz])<<","<<imag(ev[Zzz])<<"\n"; 
+   }
+
+
+}
+}
+
