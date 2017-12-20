@@ -5,8 +5,20 @@
 projectviewer::projectviewer()
 	: QStandardItemModel()
 {
-	
+	QString cwd = QDir::current().absolutePath();
+	QFile input("helpInfo.xml");
+	if (!input.open(QIODevice::ReadOnly)){
+		return;
 	}
+	QString err_msg; int err_line; int err_column;
+	bool readhelp =  toolTipsXML.setContent(&input, &err_msg, &err_line, &err_column);
+	if (!readhelp)
+	{
+		emit(errorOpeningFile(qPrintable(err_msg), err_line, err_column));
+		return;
+	}
+	input.close();
+}
 
 projectviewer::~projectviewer()
 {
@@ -97,7 +109,12 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 	
 	if (elementName != QString("#comment"))
 	{
-
+		QDomNodeList tooltips = toolTipsXML.elementsByTagName(thisItemName->nodeName);
+		if (!tooltips.isEmpty())
+		{
+			QString  nodevalue = tooltips.item(0).toElement().firstChild().nodeValue();
+			thisItemName->setToolTip(nodevalue);
+		}
 		parent->appendRow(thisItemName);
 
 		int par = 0;
@@ -286,7 +303,7 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 		plot->graph(numgraph)->setData(x, y);
 		numgraph++;
 	}
-	plot->rescaleAxes();
+	//plot->rescaleAxes();
 	// ........................................................
 
     

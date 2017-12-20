@@ -13,6 +13,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 		recentFileActs[i]->setVisible(false);
 	}
 
+	projmodel = new projectviewer(); //stays before loadRecentFiles, since the latter changes cwd
 	loadRecentFiles();
 	disableButtons();
 	ui.AbortAction->setEnabled(false);
@@ -34,7 +35,6 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	ui.gridLayout_2->addWidget(resultPlot, 0, 1, 1, 1);
 
 
-	projmodel = new projectviewer();
 	ui.treeView->setModel(projmodel);
 	ui.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui.menuBar->show();

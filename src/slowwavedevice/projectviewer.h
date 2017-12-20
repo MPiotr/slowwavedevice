@@ -7,7 +7,7 @@
 #include <qfile.h>
 #include <qabstractxmlreceiver.h>
 #include "qcustomplot.h"
-#include "dispersion.h"
+#include "synchronism.h"
 #include "xml_routines.h"
 
 class projectviewer : public QStandardItemModel
@@ -38,6 +38,7 @@ signals:
 
 private:
 	QDomDocument doc; 
+	QDomDocument toolTipsXML;
 	void addNode(QDomNode *, QStandardItem  *);
 	void addOnlyNode(QDomNode *, QStandardItem  *, int );
 

@@ -1,0 +1,43 @@
+<xml version="1.0" encoding="ISO-8859-1">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName>Имя проекта</problemName>
+  <beam>
+   <voltage>Напряжение между катодом и анодом, кВ</voltage>
+   <current>Электронный ток,А</current>
+   <height unit="mm">Какая-то высота в миллиметрах</height>
+   <beamStructureGap unit="mm">Зазор между структурой и пучком в миллиметрах (неактивена, если задано fieldFileName)</beamStructureGap>
+   <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)</beamWidth>
+   <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)</beamHeight>
+   <angle>Угол синхронизма в градусах (неактивен, если задано dispersionFileName)</angle>
+  </beam>
+  <wave/>
+  <cavity>
+   <LFsection>
+    <period>Период гофрировки, мм</period>
+    <periodNumbers>Число периодов гофрировки (в низкочастотной секции, для умножителя)</periodNumbers>
+    <periodNorma>Норма одного периода гофировки (низкочастотной секции, для умножителя)</periodNorma>
+    <QFactor>Добротность одного периода гофировки (низкочастотной секции, для умножителя)</QFactor>
+    <boundaryReflection>Для лампы обратной волны: коэффициент отражения по амплитуде от коллекторного конца</boundaryReflection>
+	<boundaryReflectionPhase>Для лампы обратной волны: фаза коэффициента отражения по амплитуде от коллекторного конца</boundaryReflectionPhase>
+    <structureWidth unit="mm">Ширина структуры (неактивена, если задано fieldFileName)</structureWidth>
+    <groupSpeed>Групповая скорость волны (не активна, если дисперсионная зависимость задана файлом)</groupSpeed>
+    <!--group speed is negative: BWO! -->
+    <fieldFileName>Имя файла с поперечной структурой поля; csv формат</fieldFileName>
+    <dispersionFileName>Имя файла с дисперсионной характеристикой - зависимоть частоты волны, в ГГц, от набега фазы на одном периоде, в градусах, в виде csv файла, лежащего в рабочей директории</dispersionFileName>
+    <!-- <logitudinalStructureFile type="filename">coupling.csv</logitudinalStructureFile>-->
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time>Время счёта для нестационарных решателей</Time>
+   <MaxPointNumber>Количество точек по координате</MaxPointNumber>
+   <MaxLength>Длина области вычислений</MaxLength>
+   <solverName>Имя решателя</solverName>
+   <problemType>Тип проблемы для данного решателя</problemType>
+   <comment>Коментарий (будет добавлен в файл с результатом)</comment>
+   <fileIndex>Индекс файла с результатом</fileIndex>
+   <initialAmp>Для лампы обратной волны: начальная амплитуда на катодном конце с которой начинается "стрельба"</initialAmp>
+   <initialDelta>Для лампы обратной волны: начальная расстройка частоты, с которой начинается "стрельба"</initialDelta>
+  </solver>
+  <workingDirectory>Рабочая директория</workingDirectory>
+ </xs:schema>
+</xml>
