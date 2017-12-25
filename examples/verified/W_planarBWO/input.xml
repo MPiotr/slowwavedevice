@@ -26,7 +26,7 @@
     <structureWidth unit="mm">1.78</structureWidth>
     <groupSpeed>-0.2338</groupSpeed>
     <!--group speed is negative: BWO! -->
-    <fieldFileName>transField.csv</fieldFileName>
+    <fieldFileName>test1.csv</fieldFileName>
     <dispersionFileName>dispersion.csv</dispersionFileName>
     <logitudinalStructureFile type="filename">coupling.csv</logitudinalStructureFile>
    </LFsection>

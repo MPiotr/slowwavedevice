@@ -1,0 +1,41 @@
+<xml encoding="ISO-8859-1" version="1.0">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName>folded waveguide BWO ver 2</problemName>
+  <beam>
+   <voltage iterable="0" unit="kV">5.11</voltage>
+   <current>863</current>
+   <height>100</height>
+   <beamStructureGap unit="mm">1e-8</beamStructureGap>
+   <beamWidth>0.1</beamWidth>
+   <beamHeight>0.1</beamHeight>
+   <structureWidth>1000</structureWidth>
+   <angle>360</angle>
+  </beam>
+  <wave>
+   <frequency>6.6977420119097607179</frequency>
+  </wave>
+  <cavity>
+   <LFsection>
+    <period unit="mm">6.283185307179586476925286766559</period>
+    <periodNumbers iterable="0">0.15915494309189533576888376337251</periodNumbers>
+    <periodNorma>1.</periodNorma>
+    <QFactor iterable="0">1e30</QFactor>
+    <structureWidth unit="mm">178</structureWidth>
+    <groupSpeed>-1</groupSpeed>
+    <!--group speed is negative: BWO! -->
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time>75</Time>
+   <MaxPointNumber>330</MaxPointNumber>
+   <MaxLength>1.1</MaxLength>
+   <solverName>twt</solverName>
+   <problemType>bwostart</problemType>
+   <comment>twt2d_dimless</comment>
+   <fileIndex>0</fileIndex>
+   <initialAmp>1.58e-5</initialAmp>
+   <initialDelta>-1.51</initialDelta>
+  </solver>
+  <workingDirectory>F:/Piotr/CalcData/verifiedCpy/TWT_2D_dimensionlessBWO</workingDirectory>
+ </xs:schema>
+</xml>
