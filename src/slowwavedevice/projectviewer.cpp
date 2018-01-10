@@ -5,8 +5,20 @@
 projectviewer::projectviewer()
 	: QStandardItemModel()
 {
-	
+	QString cwd = QDir::current().absolutePath();
+	QFile input("helpInfo.xml");
+	if (!input.open(QIODevice::ReadOnly)){
+		return;
 	}
+	QString err_msg; int err_line; int err_column;
+	bool readhelp =  toolTipsXML.setContent(&input, &err_msg, &err_line, &err_column);
+	if (!readhelp)
+	{
+		emit(errorOpeningFile(qPrintable(err_msg), err_line, err_column));
+		return;
+	}
+	input.close();
+}
 
 projectviewer::~projectviewer()
 {
@@ -97,7 +109,12 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 	
 	if (elementName != QString("#comment"))
 	{
-
+		QDomNodeList tooltips = toolTipsXML.elementsByTagName(thisItemName->nodeName);
+		if (!tooltips.isEmpty())
+		{
+			QString  nodevalue = tooltips.item(0).toElement().firstChild().nodeValue();
+			thisItemName->setToolTip(nodevalue);
+		}
 		parent->appendRow(thisItemName);
 
 		int par = 0;
@@ -208,13 +225,17 @@ QString projectviewer::getXMLString()
 	return doc.toString();
 }
 
-void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
+void projectviewer::setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints)
 {
-	char dispersionFileName[200];
+	char dispersionFileName[200] = "";
 	double norm1;
 	QDomNode LFsection = doc.elementsByTagName("LFsection").item(0);
-	if (LFsection.isNull()){ printf("Error: LFsection entry is not found\n"); return; }
-	if (!setXMLEntry(&LFsection, "period", &period)) { printf("Error: LF period is not found\n"); return; }
+	if (LFsection.isNull()){
+		console->append("<b><font color=\"red\">Error: LFsection entry is not found</font></b>"); return;
+	}
+	if (!setXMLEntry(&LFsection, "period", &period)) {
+		console->append("<b><font color=\"red\">Error: LF period is not found</font></b>");  return;
+	}
 	
 	Synchronism *syncwave;
 	Interpolation *interpolation;
@@ -224,10 +245,11 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 	setXMLEntry(&doc, "frequency", &fre, &iteratedParams, &iteratedNames);	k1 = fre*2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 1);
 	QVector<double> y(Npoints + 1);
-	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName))
+	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).isReadable())
 	{
 		syncwave = new Synchronism(dispersionFileName, period, 299.8*k1 / (2.*M_PI));
 		interpolation = new Interpolation(dispersionFileName);
+
 		for (int i = 0; i <= Npoints; i++)
 		{
 			x[i] = 720 / (double)Npoints * i;
@@ -242,9 +264,10 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 	}
 	else
 	{
+		if (!setXMLEntry(&doc, "dispersionFileName", dispersionFileName)) console->append("<b><font color=\"red\">Error</font></b> reading file <b>"+QString(dispersionFileName)+"</b>");
 		plot->addGraph();
 		plot->graph(0)->data()->insert(0, QCPData(0, fre));
-		plot->graph(0)->data()->insert(720, QCPData(720, fre));
+		plot->graph(0)->data()->insert(720, QCPData(720, fre)); 
 	}
 
 	double voltage;
@@ -286,7 +309,7 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 		plot->graph(numgraph)->setData(x, y);
 		numgraph++;
 	}
-	plot->rescaleAxes();
+	//plot->rescaleAxes();
 	// ........................................................
 
     
@@ -304,13 +327,18 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 	Interpolation *interpolation;
 
 	double k1;
-
+	 
 	setXMLEntry(&doc, "frequency", &k1, &iteratedParams, &iteratedNames);	k1 *= 2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 2);
 	QVector<double> y(Npoints + 2);
 	if (setXMLEntry(&doc, entryName, fileName))
 	{
+		if (!QFile(QString(fileName)).isReadable()) { 
+			browser->append("<b><font color = \"red\">Error</font></b> reading file <b>" + QString(fileName) + "</b>"); 
+			return;
+		}
 		interpolation = new Interpolation(fileName);
+	
 		
 		double max = interpolation->xMax();
 		double min = interpolation->xMin();

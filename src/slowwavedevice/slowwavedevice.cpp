@@ -13,6 +13,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 		recentFileActs[i]->setVisible(false);
 	}
 
+	projmodel = new projectviewer(); //stays before loadRecentFiles, since the latter changes cwd
 	loadRecentFiles();
 	disableButtons();
 	ui.AbortAction->setEnabled(false);
@@ -34,7 +35,6 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	ui.gridLayout_2->addWidget(resultPlot, 0, 1, 1, 1);
 
 
-	projmodel = new projectviewer();
 	ui.treeView->setModel(projmodel);
 	ui.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui.menuBar->show();
@@ -287,7 +287,7 @@ void slowwavedevice::openFileFun(QString inputFile)
 	setWindowTitle("Slow-wave device solver: " + inputFile);
 	projmodel->setprojContent(&input);
 	ui.treeView->expandAll();
-	projmodel->setDispersionsPlot(qplot, 50);
+	projmodel->setDispersionsPlot(qplot, ui.textBrowser, 50);
 	projmodel->setPlot(couplingPlot, "logitudinalStructureFile", 50, ui.textBrowser);
 	qplot->replot();
 	input.close();

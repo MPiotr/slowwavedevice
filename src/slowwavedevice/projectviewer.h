@@ -7,7 +7,7 @@
 #include <qfile.h>
 #include <qabstractxmlreceiver.h>
 #include "qcustomplot.h"
-#include "dispersion.h"
+#include "synchronism.h"
 #include "xml_routines.h"
 
 class projectviewer : public QStandardItemModel
@@ -22,7 +22,7 @@ public:
 	QDomDocument getDoc();
 	QString getXMLString();
 	QString problemName;
-	void setDispersionsPlot(QCustomPlot *plot, int Npoints);
+	void setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints);
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
 	double period;	
 	QTextBrowser *debugBrowser;
@@ -38,6 +38,7 @@ signals:
 
 private:
 	QDomDocument doc; 
+	QDomDocument toolTipsXML;
 	void addNode(QDomNode *, QStandardItem  *);
 	void addOnlyNode(QDomNode *, QStandardItem  *, int );
 
