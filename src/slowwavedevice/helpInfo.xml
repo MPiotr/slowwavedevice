@@ -1,0 +1,48 @@
+<xml version="1.0" encoding="ISO-8859-1">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName usage = "always">Имя проекта</problemName>
+  <beam>
+   <voltage iterable="0"  unit="kV" usage = "always">Напряжение между катодом и анодом, кВ</voltage>
+   <current iterable="0"  unit="A"  usage = "always">Электронный ток,А</current>
+   <height unit="mm">Какая-то высота в миллиметрах</height>
+   <beamStructureGap unit="mm">Зазор между структурой и пучком в миллиметрах (неактивена, если задано fieldFileName)</beamStructureGap>
+   <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)</beamWidth>
+   <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)</beamHeight>
+   <angle unit = "degree">Угол синхронизма в градусах (неактивен, если задано dispersionFileName)</angle>
+  </beam>
+  <wave>
+  <frequency iterable = "0" unit = "GHz">Частота входного сигнала, ГГц</frequency>
+  <power iterable = "0" unit = "W" usage = "TWT">Мощность входного сигнала, Вт</power>
+  </wave>
+  <cavity>
+   <LFsection>
+    <period usage = "always" unit ="mm">Период гофрировки, мм</period>
+    <periodNumbers iterable="0" usage = "always" unit = "none">Число периодов гофрировки (в низкочастотной секции, для умножителя)</periodNumbers>
+    <periodNorma unit = "CGS" usage = "periodNorma OR fieldFileName" default="1">Норма одного периода гофировки (низкочастотной секции, для умножителя)</periodNorma>
+    <QFactor iterable = "0" unit = "none" usage = "QFactor OR QStructureFile">Добротность одного периода гофировки (низкочастотной секции, для умножителя)</QFactor>
+    <QStructureFile type = "filename" usage = "QStructureFile OR QFactor"></QStructureFile>
+    <boundaryReflection usage = "BWO" unit = "none">Для лампы обратной волны: коэффициент отражения по амплитуде от коллекторного конца</boundaryReflection>
+    <boundaryReflectionPhase usage = "BWO">Для лампы обратной волны: фаза коэффициента отражения по амплитуде от коллекторного конца</boundaryReflectionPhase>
+    <structureWidth unit="mm">Ширина структуры (неактивена, если задано fieldFileName)</structureWidth>
+    <groupSpeed>Групповая скорость волны (не активна, если дисперсионная зависимость задана файлом)</groupSpeed>
+    <fieldFileName type="filename" usage = "fieldFileName OR periodNorma">Имя файла с поперечной структурой поля; csv формат</fieldFileName>
+    <dispersionFileName type="filename" usage = "dispersionFileName OR (frequency AND angle)">Имя файла с дисперсионной характеристикой - зависимоть частоты волны, в ГГц, от набега фазы на одном периоде, в градусах, в виде csv файла, лежащего в рабочей директории</dispersionFileName>
+    <logitudinalStructureFile type="filename" usage="optionally">Продольный профиль синхронной гармоник</logitudinalStructureFile>
+	<magneticField usage ="optionally,TWT_1D" unit ="T">Величина магнитного поля в Теслах</magneticField>
+	<maxTransversalBeta usage = "optionally,TWT_1D" unit="none">Величина максимальной поперечной скорости (нормированная на скорость света)</maxTransversalBeta>
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time usage = "never">Время счёта для нестационарных решателей</Time>
+   <MaxPointNumber usage = "always">Количество точек по координате</MaxPointNumber>
+   <MaxLength usage = "always" unit = "none">Длина области вычислений</MaxLength>
+   <solverName usage = "BWO" type = "selected option" options = "TWT_1D,TWT_2D">Имя решателя</solverName>
+   <problemType usage = "always" type="selected option" options = "orotron,BWO,TWT">Тип проблемы для данного решателя</problemType>
+   <comment usage = "always">Коментарий (будет добавлен в файл с результатом)</comment>
+   <fileIndex usage = "always">Индекс файла с результатом</fileIndex>
+   <initialAmp usage = "BWO">Для лампы обратной волны: начальная амплитуда на катодном конце с которой начинается "стрельба"</initialAmp>
+   <initialDelta usage = "BWO">Для лампы обратной волны: начальная расстройка частоты, с которой начинается "стрельба"</initialDelta>
+  </solver>
+  <workingDirectory usage = "always">Рабочая директория</workingDirectory>
+ </xs:schema>
+</xml>

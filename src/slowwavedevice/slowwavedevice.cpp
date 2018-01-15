@@ -291,6 +291,7 @@ void slowwavedevice::openFileFun(QString inputFile)
 	projmodel->setPlot(couplingPlot, "logitudinalStructureFile", 50, ui.textBrowser);
 	qplot->replot();
 	input.close();
+
 	if (!recentFiles.contains(inputFile))
 	{
 		recentFiles.push_front(inputFile);
@@ -301,6 +302,7 @@ void slowwavedevice::openFileFun(QString inputFile)
 		recentFiles.removeOne(inputFile);
 		recentFiles.push_front(inputFile);
 	}
+	updateRecentFilesActions();
 
 	ui.textBrowser->append("<div align = \"left\"> open " + inputFile + "</div><div align = \"center\"><b>" + projmodel->problemName + "</b></div><div><div align = \"left\"></div>");
 	enableButtons();

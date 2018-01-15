@@ -54,9 +54,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>F:\Piotr\Visual Studio Projects\cudaSlowWaveDeviceSolver\cudaSlowWaveDeviceSolver\Debug;C:\mathgl\mathgl-2.3.4.LGPL-mingw.i386\bin;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SOLUTION_DIR)..\cudaSlowWaveDeviceSolver\Debug;C:\mathgl\mathgl-2.3.4.LGPL-mingw.i386\bin;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>interpolation.obj;dispersion.obj;xml_routines.obj;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Qt5WebKitd.lib;Qt5WebkitWidgetsd.lib;Qt5XmlPatternsd.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>synchronism.obj;interpolation.obj;xml_routines.obj;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Qt5WebKitd.lib;Qt5WebkitWidgetsd.lib;Qt5XmlPatternsd.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,9 +70,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>F:\Piotr\Visual Studio Projects\cudaSlowWaveDeviceSolver\cudaSlowWaveDeviceSolver\Release;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SOLUTION_DIR)\..\src\cudaSlowWaveDeviceSolver\Release;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>interpolation.obj;dispersion.obj;xml_routines.obj;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5Xml.lib;Qt5WebKit.lib;Qt5WebkitWidgets.lib;Qt5XmlPatterns.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>interpolation.obj;synchronism.obj;xml_routines.obj;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5Xml.lib;Qt5WebKit.lib;Qt5WebkitWidgets.lib;Qt5XmlPatterns.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
