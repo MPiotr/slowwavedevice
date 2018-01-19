@@ -37,10 +37,10 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -53,7 +53,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <OutputFile>$(OutputPath)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(SOLUTION_DIR)..\cudaSlowWaveDeviceSolver\Debug;C:\mathgl\mathgl-2.3.4.LGPL-mingw.i386\bin;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>synchronism.obj;interpolation.obj;xml_routines.obj;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Qt5WebKitd.lib;Qt5WebkitWidgetsd.lib;Qt5XmlPatternsd.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -69,7 +69,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <OutputFile>$(OutputPath)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(SOLUTION_DIR)..\cudaSlowWaveDeviceSolver\Release;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>interpolation.obj;synchronism.obj;xml_routines.obj;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5Xml.lib;Qt5WebKit.lib;Qt5WebkitWidgets.lib;Qt5XmlPatterns.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>

@@ -2,11 +2,14 @@
 #include "bwo.h"
 #include "twt_1d.h"
 #include "twt_2d.h"
+#include "twt_0d.h"
 
 #include "xml_routines.h"
 
+template class BWO<TWT_0D>;
 template class BWO<TWT_1D>;
 template class BWO<TWT_2D>;
+
 
 template  <class TWTsolver>
 BWO<TWTsolver>::BWO(QDomDocument *doc) : TWTsolver(doc)

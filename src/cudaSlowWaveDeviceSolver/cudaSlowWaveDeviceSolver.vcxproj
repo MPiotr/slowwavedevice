@@ -29,6 +29,7 @@
     <ClInclude Include="Interpolation.h" />
     <ClInclude Include="Multiplier.h" />
     <ClInclude Include="twt.h" />
+    <ClInclude Include="twt_0d.h" />
     <ClInclude Include="twt_1d.h" />
     <ClInclude Include="twt_2d.h" />
     <ClInclude Include="xml_routines.h" />
@@ -37,6 +38,7 @@
     <CudaCompile Include="multiplier.cu" />
     <CudaCompile Include="multiplier_spcharge.cu" />
     <CudaCompile Include="multiplier_spcharge_2d.cu" />
+    <CudaCompile Include="twt_0d.cu" />
     <CudaCompile Include="twt_1d.cu" />
     <CudaCompile Include="twt_bwo_2d.cu" />
   </ItemGroup>
@@ -53,6 +55,7 @@
     <ClCompile Include="multiplier_multimode.cpp" />
     <ClCompile Include="multipliler_doublescheme.cpp" />
     <ClCompile Include="twt.cpp" />
+    <ClCompile Include="twt_0d.cpp" />
     <ClCompile Include="twt_1d.cpp" />
     <ClCompile Include="twt_2d.cpp" />
     <ClCompile Include="xml_routines.cpp" />
@@ -107,9 +110,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,6 +130,7 @@
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Xmld.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Qt\5.0\5.5\msvc2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
@@ -167,6 +175,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Xml.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Qt\5.0\5.5\msvc2012\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"

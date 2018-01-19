@@ -1,5 +1,3 @@
-//#include"print.h"
-//#include"Constants.h"
 #include"Multiplier.h"
 #include <QtCore\qsharedmemory.h>
 #include <QtCore\qbuffer.h>
@@ -7,6 +5,7 @@
 #include<iostream>
 #include"twt_2d.h"
 #include"twt_1d.h"
+#include"twt_0d.h"
 #include"bwo.h"
 #include "orotron.h"
 #include "multiplier_spcharge_2d.h"
@@ -398,13 +397,13 @@ int startXML(int argc, char *argv[])
 			try   { 
 				_chdir(argv[2]); 
 			}
-			catch (std::exception  exeption){
+			catch (std::exception  e){
 				printf("Failed to find specified directory\n");
 				return 3;
 			}
 		}
 		else 
-			_chdir("F:\\Piotr\\CalcData\\twt_data\\W_twt_axi_1d_mesh");
+			_chdir("F:\\Piotr\\CalcData\\verifiedCpy\\Ka_bwo_axial_twt0d");
 
 		QFile file("input.xml");
 		if (!file.open(QIODevice::ReadOnly))
@@ -431,6 +430,7 @@ int startXML(int argc, char *argv[])
 
 	timeb start, finish;
 	ftime(&start);
+	bool solverfound = false;
 	if (strcmp(problemType, "bwo") == 0)
 	{
 		if (strcmp(solverName, "twt") == 0)
@@ -443,15 +443,17 @@ int startXML(int argc, char *argv[])
 			BWO<TWT_1D> sol(&doc);
 			sol.solveBWO();
 		}
+		else if (strcmp(solverName, "twt0d") == 0)
+		{
+			BWO<TWT_0D> sol(&doc);
+			sol.solveBWO();
+		}
 		else
 		{
 			printf("solver name is not recognized\n");
 		}
 
-		ftime(&finish);
-		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
-		Sleep(1000);
-		return 0;
+		solverfound = true;
 	}
 	if (strcmp(problemType, "bwostart") == 0)
 	{
@@ -465,59 +467,60 @@ int startXML(int argc, char *argv[])
 			BWO<TWT_1D> sol(&doc);
 			sol.findStartCurrent();
 		}
+		else if (strcmp(solverName, "twt0d") == 0)
+		{
+			BWO<TWT_0D> sol(&doc);
+			sol.findStartCurrent();
+		}
 		else
 		{
 			printf("solver name is not recognized\n");
 		}
-	//	BWO_2D sol(&doc);
-	//	sol.findStartCurrent();
-
-		ftime(&finish);
-		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
-		Sleep(1000);
-		return 0;
+		solverfound = true;
 	}
 	if (strcmp(problemType, "twt") == 0)
 	{
 		TWT_2D sol(&doc);
 		sol.solveTWT();
-
-		ftime(&finish);
-		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
-		Sleep(1000);
-		return 0;
+		solverfound = true;
 	}
 	if (strcmp(problemType, "twt1d") == 0)
 	{
 		TWT_1D sol(&doc);
 		sol.solveTWT();
-
-		ftime(&finish);
-		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
-		Sleep(1000);
-		return 0;
+		solverfound = true;
+	}
+	if (strcmp(problemType, "twt0d") == 0)
+	{
+		TWT_0D sol(&doc);
+		sol.solveTWT();
+		solverfound = true;
 	}
 	if (strcmp(problemType, "orotron") == 0)
 	{
 		Orotron sol(&doc);
 		sol.solveOrotron();
-		ftime(&finish);
-		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
-		Sleep(1000);
-		return 0;
+		solverfound = true;
 	}
 	if (strcmp(problemType, "orotronstart") == 0)
 	{
 		Orotron sol(&doc);
 		sol.orotronStartCurrent();
+		solverfound = true;
+	}
+
+	if (solverfound)
+	{
 		ftime(&finish);
 		printf("Elapsed time %g s\n", 0.001*(float)(1000 * (finish.time - start.time) + finish.millitm - start.millitm));
 		Sleep(1000);
 		return 0;
 	}
-
-	printf("Error in recognizing problem type in input\nStop\n"); 
-	return 2;
+	else
+	{
+		printf("Error in recognizing problem type in input\nStop\n");
+		return 2;
+	}
 
 
 }

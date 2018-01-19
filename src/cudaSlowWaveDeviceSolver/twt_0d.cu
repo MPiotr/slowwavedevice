@@ -1,12 +1,10 @@
 #include "cu_mult.h"
-#include "twt_1d.h"
+#include "twt_0d.h"
 
 #define PAR ParamsM
 #ifndef dm_Pi
 __device__ const double dm_Pi = 3.141592653589793;
 #endif
-
-
 
 static __device__ void biAverage(double *A, double *B, int p0, int datasize, int logsize)
 {
@@ -33,66 +31,23 @@ static __device__ void biAverage(double *A, double *B, int p0, int datasize, int
 
 
 }
-__device__ void findPosition(double *mesh, double x, double* xplus, double* xminus, int *nplus, int *nminus, int N)
-{
-	if (x >= mesh[N - 1])
-	{
-		*xplus = mesh[N - 1];
-		*xminus = mesh[N - 2];
-		*nplus = N - 1;
-		*nminus = N - 2;
-		return;
-	}
-	else if (x <= mesh[0])
-	{
-		*xplus = mesh[1];
-		*xminus = mesh[0];
-		*nplus = 1;
-		*nminus = 0;
-		return;
-	}
-	else
-	{
-		int nmax = N-1;
-		int nmin = 0;
-		for (int i = 0; i < round(log2((double)N)); i++)
-		{
-			if (mesh[(nmax - nmin) / 2 + nmin] == x) { nmax = (nmax - nmin) / 2 + nmin; nmin = nmax - 1; break; }
-			if (mesh[(nmax - nmin) / 2 + nmin] > x) nmax = (nmax - nmin) / 2 + nmin;
-			else nmin = (nmax - nmin) / 2 + nmin;
-			if (nmax - nmin == 1) break;
-		}
-		*nplus = nmax;
-		*nminus = nmin;
-		*xplus = mesh[nmax];
-		*xminus = mesh[nmin];
-	}
 
+inline static __device__ double cyclotronRadius(double Rcycl, double r0, double z, double hc, double phase)
+{
+	return Rcycl*cos(hc*z + phase) + r0;
 }
 
-__device__ double fieldAtX(double *F, double *mesh, double x, int Nmesh)
-{
-	double xplus, xminus;
-	int nplus, nminus;
-
-	findPosition(mesh, x, &xplus, &xminus, &nplus, &nminus, Nmesh);
-
-	double coefMinus = (xplus - x) / (mesh[nplus] - mesh[nminus]);
-	double coefPlus = (x - xminus) / (mesh[nplus] - mesh[nminus]);
-	return coefPlus*F[nplus] + coefMinus*F[nminus];
-}
-
-__global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int NumMesh, int i, int k, double K, double coupling = 1)
+__global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, double K, double coupling = 1, double Rshift = 0)
 {
 	unsigned int p0 = threadIdx.x;			unsigned int Np = blockDim.x;    //x coordinates of beam x-section, ph - cyclotron phase spread
 	unsigned int x0 = threadIdx.y;			unsigned int Nx = blockDim.y;    //p -- wave phase
 	unsigned int ph0 = threadIdx.z;		    unsigned int Nph = blockDim.z;
 
-	unsigned int P  = blockIdx.x;		    unsigned int NP_ = gridDim.x;  //P-grid index is for v_trans spread
-	unsigned int X  = blockIdx.y;			unsigned int NX =  gridDim.y;
+	unsigned int P = blockIdx.x;		    unsigned int NP_ = gridDim.x;  //P-grid index is for v_trans spread
+	unsigned int X = blockIdx.y;			unsigned int NX = gridDim.y;
 	unsigned int PC = blockIdx.z;			unsigned int NPC = gridDim.z;
 
-//	unsigned int p = Np*P + p0;	  	    unsigned int Np_max = Np*NP_;
+	//	unsigned int p = Np*P + p0;	  	    unsigned int Np_max = Np*NP_;
 	unsigned int x = Nx*X + x0;		    unsigned int Nx_max = Nx*NX;
 	unsigned int ph = NPC*PC + ph0;	//	unsigned int Nph_max = Nph*NPC; 
 
@@ -115,13 +70,14 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int
 	v_trans_max = par->v_trans_max;
 	// cyclotron parameters
 	double h_cycl = par->h_cycl; double omega_cycl = par->omega_cycl; // циклотронное волновое число и частота
-	double ph_cyl = 2 * dm_Pi / (double) NcyclPhase*ph_cyclPhase;
+	double ph_cyl = 2 * dm_Pi / (double)NcyclPhase*ph_cyclPhase;
 	double v_trans = v_trans_max / (double)NvTrans*ph_v_trans;
 	double R_cycl = (omega_cycl != 0) ? v_trans * 299.8e9 / omega_cycl : 0; //R_cycl is in mm, so 2.998e10 -> 299.8e9 
-	// mesh parameters
+	// beam parameters
 	double beamThick = par->beamThickX;
-    //TODO: make an beam position in input. So far, zero of mesh, corresponds to the beam center
-	double r0 = (int(x) - int(Nx_max/ 2) )*beamThick / (double)Nx_max;  //initial positions of the particles
+	double beamWallGap = par->wall;
+	double r0 = int(x)*beamThick / (double)Nx_max + beamWallGap;  //initial positions of the particles
+	double decayFactor = par->g1;
 	int N = par->Nz;
 	double dz = par->L / (double)N;
 	double en0 = sqrt(pow(1. + voltage / 511., 2) - v_trans*v_trans);
@@ -129,13 +85,15 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int
 	double *d_Qk = par->Qk;   double *d_Wk = par->Wk;   //k - компоненты фазы и энергии
 	double *Q0 = par->Q0;   double *W0 = par->W0;   //фаза and энергия
 	double rA = par->ar0[i];  double iA = par->ai0[i];  //амплитуда (огибающая по z) 	
-		// ..... init shared memory ...........................
 
+	//array for accounting particle interseption
+	int *destroyed = par->ifnotdestroyed;
+	int ifnotdestroyed = destroyed[gstride + xi];
+
+	// ..... init shared memory ...........................
 	__shared__ double    sh_imJ[NS*NQ*NP];
 	__shared__ double    sh_reJ[NS*NQ*NP];
-	__shared__ double    sh_mesh[NMESHMAX];
-	__shared__ double    sh_Ar[NMESHMAX];
-	__shared__ double    sh_Ai[NMESHMAX];
+
 
 	double Q, Qk;
 	double W, Wk;
@@ -155,12 +113,6 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int
 		W0[gstride + xi] = W;
 
 	}
-	if (xi < NumMesh)
-	{
-		sh_mesh[xi] = mesh[xi];
-		sh_Ar[xi] = Ar[xi];
-		sh_Ai[xi] = Ai[xi];
-	}
 	// ....... at the left end of the space, set HF current to zero
 	if ((i == 0) && (xi == 0))
 	{
@@ -179,13 +131,15 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int
 	// --------- make a step -------------------------
 
 	z = ((double)i + K)*dz;
-	
-	double r = R_cycl*cos(h_cycl*z + ph_cyl) + r0;
-	double frA = fieldAtX(sh_Ar, sh_mesh, r, NumMesh);
-	double fiA = fieldAtX(sh_Ai, sh_mesh, r, NumMesh);
 
-	frA *= coupling;
-	fiA *= coupling;
+	double r = cyclotronRadius(R_cycl, r0, z, h_cycl, ph_cyl) +  Rshift;
+	if (r < 0) 
+		par->ifnotdestroyed[gstride + xi] *= 0;
+	double frA = *Ar*exp(-decayFactor*r);
+	double fiA = *Ai*exp(-decayFactor*r);
+
+	frA *= coupling*double(ifnotdestroyed);
+	fiA *= coupling*double(ifnotdestroyed);
 
 	PH = Q + K*Qk;
 	EN = W + K*Wk + en0;
@@ -208,10 +162,10 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, double *mesh, int
 
 	// ===========Усреднение=======================	
 
-	sh_imJ[xi] = -imF / double(warpsize);
-	sh_reJ[xi] = reF / double(warpsize);
+	sh_imJ[xi] = -imF / double(warpsize)*double(ifnotdestroyed);
+	sh_reJ[xi] = reF / double(warpsize)*double(ifnotdestroyed);
 
-	__syncthreads();
+	__syncthreads(); 
 
 
 	biAverage(sh_imJ, sh_reJ, xi, warpsize, log2warpsize); // averaged values are stored in zero indexes
@@ -293,11 +247,11 @@ static __global__ void endstep(PAR *par, int i)
 	unsigned int x0 = threadIdx.y;			unsigned int Nx = blockDim.y;
 	unsigned int y0 = threadIdx.z;		    unsigned int Ny = blockDim.z;
 
-	unsigned int P = blockIdx.x;	  //unsigned int NP_ = gridDim.x;
+	unsigned int P = blockIdx.x;	    unsigned int NP_ = gridDim.x;
 	unsigned int X = blockIdx.y;		unsigned int NX = gridDim.y;
 	unsigned int Y = blockIdx.z;		unsigned int NY = gridDim.z;
-	
-/*	unsigned int p = Np*P + p0;		    unsigned int Np_max = Np*NP_;
+
+	/*	unsigned int p = Np*P + p0;		    unsigned int Np_max = Np*NP_;
 	unsigned int x = Nx*X + x0;		    unsigned int Nx_max = Nx*NX;
 	unsigned int y = Ny*Y + y0;			unsigned int Ny_max = Ny*NY;*/
 
@@ -310,6 +264,7 @@ static __global__ void endstep(PAR *par, int i)
 	// ............ init problem parameters ...................................
 	//	unsigned int xi = threadIdx.x;	    unsigned int Np = blockDim.x;
 	//	unsigned int warpsize = Np;
+
 
 	// .................... get access to phase, energy and current  k-coefficients
 	double *d_Qk = par->Qk;		double *Q0 = par->Q0;
@@ -334,7 +289,7 @@ static __global__ void endstep(PAR *par, int i)
 
 }
 
-std::complex<double>  TWT_1D::solveTWT_1d(std::complex<double>  *A, double *Ar, double *Ai, double inputAmp, double lossKappa, double delta,
+std::complex<double>  TWT_0D::solveTWT_0d(std::complex<double>  *A, double *Ar, double *Ai, double inputAmp, double lossKappa, double delta,
 	double *fieldStructureRe, double *fieldStructureIm, double *mesh, double G, double enPrint, bool printField, double *lStrRe, double *lStrIm, double *qStr)
 {
 	int GX = Nq / NQ; int GY = Ns / NS; int GP = Nv;
@@ -363,28 +318,30 @@ std::complex<double>  TWT_1D::solveTWT_1d(std::complex<double>  *A, double *Ar, 
 	gpuErrChk(cudaMemset(d_ar0, 0, sizeof(double)*Nmax));
 	gpuErrChk(cudaMemset(d_avEN, 0, sizeof(double)));
 
-	gpuErrChk(cudaMemcpy(d_fAr, fieldStructureRe, NumMesh*sizeof(double), cudaMemcpyHostToDevice));
-	gpuErrChk(cudaMemcpy(d_fAi, fieldStructureIm, NumMesh*sizeof(double), cudaMemcpyHostToDevice));
-	gpuErrChk(cudaMemcpy(d_mesh, mesh, NumMesh*sizeof(double), cudaMemcpyHostToDevice));
+	gpuErrChk(cudaMemcpy(d_fAr, fieldStructureRe, sizeof(double), cudaMemcpyHostToDevice));
+	gpuErrChk(cudaMemcpy(d_fAi, fieldStructureIm, sizeof(double), cudaMemcpyHostToDevice));
+
 
 	double h = 2 * Pi / period*(synch_angle / 360.);
 	double La = Nperiods*period*h;
 	double dz = Lmax / double(Nmax);
 
-//TODO make separate functions for copying twt_1d params
+	//TODO make separate functions for copying twt_1d params
 	ParamsM par = setPar();
 	par.G = G;
 	par.h = h;
 	par.delta = delta;
 	par.lossKappa = lossKappa;
-	par.beamThickX = beamWidth;
+	par.beamThickX = beamHeight;
 	par.beamThickY = beamHeight;
 	par.omega_cycl = omega_cycl;
 	par.h_cycl = h_cycl / h;
 	par.v_trans_max = v_trans_max;
+	par.g1 = sqrt(h*h - k1*k1);
 
-//	double *energy = new double[Np*Nq*Ns*Nv];
-//	double *phase = new double[Np*Nq*Ns*Nv];
+
+	//	double *energy = new double[Np*Nq*Ns*Nv];
+	//	double *phase = new double[Np*Nq*Ns*Nv];
 
 	int Nstop = ceil(La / dz);
 	if (Nstop >= Nmax) Nstop = Nmax - 1;
@@ -408,11 +365,6 @@ std::complex<double>  TWT_1D::solveTWT_1d(std::complex<double>  *A, double *Ar, 
 		res_enr = fopen("enPhase.csv", "w");
 	}
 
-	if (NumMesh > NMESHMAX)
-	{
-		printf("Length of the field table is larger than NMESHMAX. Either change NMESHMAX and recompile of use sparser amplitude table\n");
-		return 0;
-	}
 	if (gridsize > SHARRAYSIZE)
 	{
 		printf("The size of the grid is larger than the shared memory array used for averaging\n");
@@ -429,14 +381,13 @@ std::complex<double>  TWT_1D::solveTWT_1d(std::complex<double>  *A, double *Ar, 
 			if (lStrRe) coupl = (1. - K[k])*lStrRe[i] + K[k] * lStrRe[i + 1]; else coupl = 1;
 			if (qStr) loss = lossKappa / ((1. - K[k])*qStr[i] + K[k] * qStr[i + 1]); else loss = lossKappa;
 			if (!isfinite(loss)) loss = lossKappa;
-			// TODO: put d_mesh and NumMesh inside par
-			particleStep << <motiongrid, motionwarp >> >(d_par, d_fAr, d_fAi, d_mesh, NumMesh, i, k, K[k], coupl);
+			particleStep << <motiongrid, motionwarp >> >(d_par, d_fAr, d_fAi, i, k, K[k], coupl);
 			amplitudeStep << <1, gridsize >> >(d_par, i, k, K[k], loss);
 
-	/*		double rJ, iJ;
+			/*		double rJ, iJ;
 			cudaMemcpy(&rJ, d_rJ3, sizeof(double), cudaMemcpyDeviceToHost);
 			cudaMemcpy(&iJ, d_iJ3, sizeof(double), cudaMemcpyDeviceToHost);
-		//	fprintf(res_enr, "%g,%g,%g\n", z, rJ, iJ);
+			//	fprintf(res_enr, "%g,%g,%g\n", z, rJ, iJ);
 			printf("%g,%g,%g\n", z, rJ, iJ);*/
 		}
 		endstep << <motiongrid, motionwarp >> >(d_par, i);
@@ -459,18 +410,18 @@ std::complex<double>  TWT_1D::solveTWT_1d(std::complex<double>  *A, double *Ar, 
 		fclose(res_enr);
 	}
 
-	return cplx (Ar[Nstop - 1], Ai[Nstop - 1]);
+	return cplx(Ar[Nstop - 1], Ai[Nstop - 1]);
 
 }
-bool TWT_1D::initSolver(int nz, double lsolver)
+bool TWT_0D::initSolver(int nz, double lsolver)
 {
-//	TWT::initSolver(nz, lsolver);
+	//	TWT::initSolver(nz, lsolver);
 
-	gpuErrChk(cudaMalloc((void**)&d_fAr, NMESHMAX*sizeof(double)))
-	gpuErrChk(cudaMalloc((void**)&d_fAi, NMESHMAX*sizeof(double)))
-	gpuErrChk(cudaMalloc((void**)&d_mesh, NMESHMAX*sizeof(double)))
+    	gpuErrChk(cudaMalloc((void**)&d_fAr, NMESHMAX*sizeof(double)))
+		gpuErrChk(cudaMalloc((void**)&d_fAi, NMESHMAX*sizeof(double)))
+		gpuErrChk(cudaMalloc((void**)&d_mesh, NMESHMAX*sizeof(double)))
 
-	printf("</font>....... End initialization\n\n");
+		printf("</font>....... End initialization\n\n");
 	return 1;
 }
-	
+

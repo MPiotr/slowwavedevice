@@ -14,7 +14,7 @@ int Nz = 0;
 double Lsolver = 0;
 double MultiplierGroupSpeedCoefficient = 0;
 
-__device__ __constant__ double grSpeedCoeff;
+__device__  double grSpeedCoeff;
 int *d_Nz;
 double *d_Lsolver;
 
@@ -1694,7 +1694,7 @@ ParamsM Multiplier::setPar()
 
 	int *mass = new int [Np*Nq*Ns*Nv];
 	for(int a = 0; a < Np*Nq*Ns*Nv; a++) mass[a] = 1;
-	cudaMemcpy(d_ifnotdestroyed, mass, sizeof(int)*Np*Nq*Ns*Nv, cudaMemcpyHostToDevice);
+	gpuErrChk(cudaMemcpy(d_ifnotdestroyed, mass, sizeof(int)*Np*Nq*Ns*Nv, cudaMemcpyHostToDevice));
 	delete [] mass;
 
 

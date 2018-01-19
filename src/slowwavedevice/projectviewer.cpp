@@ -245,7 +245,7 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, in
 	setXMLEntry(&doc, "frequency", &fre, &iteratedParams, &iteratedNames);	k1 = fre*2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 1);
 	QVector<double> y(Npoints + 1);
-	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).isReadable())
+	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).exists())
 	{
 		syncwave = new Synchronism(dispersionFileName, period, 299.8*k1 / (2.*M_PI));
 		interpolation = new Interpolation(dispersionFileName);
@@ -333,7 +333,7 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 	QVector<double> y(Npoints + 2);
 	if (setXMLEntry(&doc, entryName, fileName))
 	{
-		if (!QFile(QString(fileName)).isReadable()) { 
+		if (!QFile(QString(fileName)).exists()) {
 			browser->append("<b><font color = \"red\">Error</font></b> reading file <b>" + QString(fileName) + "</b>"); 
 			return;
 		}
