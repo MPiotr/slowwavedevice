@@ -1,9 +1,10 @@
 #include "twt_0d.h"
+#include "xml_routines.h"
 
 
 TWT_0D::TWT_0D(QDomDocument *doc) :TWT_1D(doc)
 {
-
+	if (!setXMLEntry(doc, "clinotronAngle", &clinotronAngle, &iteratedParams, &iteratedNames)) clinotronAngle = 0;
 }
 
 TWT_0D::TWT_0D(QDomDocument *doc, TWT_0D *instance) : TWT_1D(doc, instance)
@@ -36,4 +37,22 @@ void TWT_0D::readTransversalStructure()
 	structIm = strAi;
 
 	return;
+}
+void TWT_0D::changeParam(string	 name, double value)
+{
+	Multiplier::changeParam(name, value);
+	if (name == "clinotronAngle") clinotronAngle = value;
+}
+
+void TWT_0D::printCurrentParams(FILE *file)
+{
+	TWT_1D::printCurrentParams(file);
+	fprintf(file, "%g,", clinotronAngle);
+
+}
+
+void TWT_0D::printParamsHeader(FILE *file)
+{
+	TWT_1D::printParamsHeader(file);
+	fprintf(file, "%g,", clinotronAngle);
 }

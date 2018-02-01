@@ -1283,7 +1283,7 @@ bool Multiplier::initMultiplierSolver(int nz, double lsolver, double groupSpeedC
 	gpuErrChk(cudaMalloc((void**)&d_par, sizeof(PAR)));
 	gpuErrChk(cudaMalloc((void**)&grSpeedCoeff, sizeof(double)));
 	gpuErrChk(cudaMemcpy((void*)d_Nz, &Nz, sizeof(int), cudaMemcpyHostToDevice));
-	gpuErrChk(cudaMemcpy((void*)&grSpeedCoeff, &MultiplierGroupSpeedCoefficient, sizeof(double), cudaMemcpyHostToDevice));
+	gpuErrChk(cudaMemcpy((void*)&grSpeedCoeff, &MultiplierGroupSpeedCoefficient, sizeof(double), cudaMemcpyHostToDevice)); // TODO Here is a bug
 	gpuErrChk(cudaMemcpy((void*)d_Lsolver, (void*)&Lsolver, sizeof(double), cudaMemcpyHostToDevice));
 
 	return 1;

@@ -34,7 +34,7 @@ static __device__ void biAverage(double *A, double *B, int p0, int datasize, int
 
 inline static __device__ double cyclotronRadius(double Rcycl, double r0, double z, double hc, double phase)
 {
-	return Rcycl*cos(hc*z + phase) + r0;
+	return Rcycl*sin(hc*z + phase) + r0;
 }
 
 __global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, double K, double coupling = 1, double Rshift = 0)
@@ -49,10 +49,10 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, dou
 
 	//	unsigned int p = Np*P + p0;	  	    unsigned int Np_max = Np*NP_;
 	unsigned int x = Nx*X + x0;		    unsigned int Nx_max = Nx*NX;
-	unsigned int ph = NPC*PC + ph0;	//	unsigned int Nph_max = Nph*NPC; 
+	unsigned int ph = Nph*PC + ph0;	//	unsigned int Nph_max = Nph*NPC; 
 
 	//index ph warps all over spreads, for now: cyclotron phase, transversal velocity.
-	unsigned int NcyclPhase = par->Na1;
+	unsigned int NcyclPhase = Nph*NPC;
 	unsigned int NvTrans = NP_;
 	unsigned int ph_cyclPhase = ph;
 	unsigned int ph_v_trans = P;
@@ -347,7 +347,7 @@ std::complex<double>  TWT_0D::solveTWT_0d(std::complex<double>  *A, double *Ar, 
 	if (Nstop >= Nmax) Nstop = Nmax - 1;
 	int nd = round(period / dz);
 
-	double z, coupl, loss;
+	double z, coupl, loss, Rshift;
 
 	Ar[0] = inputAmp; Ai[0] = 0;
 
@@ -381,7 +381,8 @@ std::complex<double>  TWT_0D::solveTWT_0d(std::complex<double>  *A, double *Ar, 
 			if (lStrRe) coupl = (1. - K[k])*lStrRe[i] + K[k] * lStrRe[i + 1]; else coupl = 1;
 			if (qStr) loss = lossKappa / ((1. - K[k])*qStr[i] + K[k] * qStr[i + 1]); else loss = lossKappa;
 			if (!isfinite(loss)) loss = lossKappa;
-			particleStep << <motiongrid, motionwarp >> >(d_par, d_fAr, d_fAi, i, k, K[k], coupl);
+			Rshift = -z*clinotronAngle;
+			particleStep << <motiongrid, motionwarp >> >(d_par, d_fAr, d_fAi, i, k, K[k], coupl, Rshift);
 			amplitudeStep << <1, gridsize >> >(d_par, i, k, K[k], loss);
 
 			/*		double rJ, iJ;

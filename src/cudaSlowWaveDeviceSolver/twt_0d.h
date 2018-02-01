@@ -5,7 +5,10 @@
 class TWT_0D : public TWT_1D
 {
 protected:
-	double bTesla, omega_cycl, h_cycl, v_trans_max;
+	void changeParam(string, double);
+	void printCurrentParams(FILE * file);
+	void printParamsHeader(FILE *file);
+	double clinotronAngle;
 
 	int NumMesh;
 	cplx solveTWT_0d(cplx *A, double *ar, double *ai, double inputAmp, double lossKappa, double delta,

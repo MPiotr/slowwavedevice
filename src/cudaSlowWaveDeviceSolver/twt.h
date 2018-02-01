@@ -23,8 +23,10 @@ protected:
 	void generateLongitudinalStructure(double h);
 	void generateQStructure(double h);
 
-	void printResults(FILE *file, cplx *A);
-	void printCurrentParams(FILE *file);
+	virtual void printResults(FILE *file, cplx *A);
+	virtual void printCurrentParams(FILE *file);
+	virtual void printParamsHeader(FILE *file);
+	virtual void printResultHeader(FILE *file);
 	virtual void printDataHeader(FILE *file);
 
 	double paramG(double h);

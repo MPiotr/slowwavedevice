@@ -117,7 +117,7 @@ protected:
 
 	vector< vec > iteratedParams;
 	vector< string > iteratedNames;
-	void changeParam(string, double);
+	virtual void changeParam(string, double);
 	inline double paramG();
 	double power(double kpd);
 	double efficieny;

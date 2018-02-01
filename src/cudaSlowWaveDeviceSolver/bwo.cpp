@@ -49,6 +49,7 @@ void BWO<TWTsolver>::iterate(int paramsInd)
 			double lossK = lossKappa(h);
 			solveBWO(a0, delta);
 			printResults(results);
+			fprintf(results, "\n");
 		}
 	}
 }
@@ -66,14 +67,15 @@ void BWO<TWTsolver>::printResults(FILE *file)
 	double shiftedFre = (1. + delta*(k1 / h) / fabs(group_speed))*299.8*k1 / (2.*PI);
 	eff = efficiency(a0, h);
 
-	printCurrentParams(file);
-	fprintf(file, "%15g,%15g,%15g,%15g,%15g,%15g\n", a0, PoutLeft, PoutRight, delta, eff, shiftedFre);
+	TWTsolver::printCurrentParams(file);
+	TWTsolver::printResults(file, A);
+	fprintf(file, "%15g,%15g,%15g,%15g,%15g,%15g", a0, PoutLeft, PoutRight, delta, eff, shiftedFre);
 }
 template  <class TWTsolver>
 void BWO<TWTsolver>::printResultsStartCurrent(FILE *file)
 {
 	double h = 2 * Pi / period*(synch_angle / 360.);
-	printCurrentParams(file);
+	TWTsolver::printCurrentParams(file);
 	double tmpdelta = delta;
 	double Lst = getNormalizedLength(Current_ampers, &tmpdelta);
 	fprintf(file, "%15g,%15g,%15g,%15g,%15g\n", Current_ampers, delta, paramG(h), Lst, tmpdelta);
@@ -87,11 +89,13 @@ void BWO<TWTsolver>::printDataHeader(FILE *file)
 template  <class TWTsolver> 
 void BWO<TWTsolver>::printParamsHeader(FILE *file)
 {
-	fprintf(file, "кол-во периодов,угол[градусы],Ток[A],Hапряжение[кВ],групповая скорость,добротность (периода),входная мощность[Вт],");
+	TWTsolver::printParamsHeader(file);
+	//fprintf(file, "кол-во периодов,угол[градусы],Ток[A],Hапряжение[кВ],групповая скорость,добротность (периода),входная мощность[Вт],");
 }
 template  <class TWTsolver> 
 void BWO<TWTsolver>::printResultHeader(FILE *file)
 {
+	TWTsolver::printResultHeader(file);
 	fprintf(file, "output amp[W], output power (cathode)[W], output power (collector) [W], delta, efficiency, shifted frequency\n");
 }
 template  <class TWTsolver> 

@@ -209,8 +209,7 @@ void TWT::printResults(FILE *file, cplx *A)
 	eff = efficiency(Aout, h);
 	double deltaPh = arg(A[Nstop - 1] / A[0]);
 
-	printCurrentParams(file);
-	fprintf(file, "%15g,%15g,%15g,%15g,%15g,%15g,%15g\n", Aout, Pout, Amax, Pmax, Lmx, eff, deltaPh);
+	fprintf(file, "%15g,%15g,%15g,%15g,%15g,%15g,%15g", Aout, Pout, Amax, Pmax, Lmx, eff, deltaPh);
 
 	if(shMemoryCreated) printAbsAtoSharedMemory(Nstop);
 
@@ -243,9 +242,19 @@ void TWT::printCurrentParams(FILE *file)
 {
 	fprintf(file, "%g,%g,%g,%g,%g,%g,%g,%g,", Nperiods, synch_angle, Current_ampers, voltage, group_speed, Q, inputPower_watts, (syncwave!=NULL) ? syncwave->frequency() : 0);
 }
+void TWT::printParamsHeader(FILE *file)
+{
+	fprintf(file, "number of periods, synch angle[deg],Current[A],Voltage[kV],group beta,Q (one period),inpur power [W],input frequency [GHz],");
+}
+void TWT::printResultHeader(FILE *file)
+{
+	fprintf(file, "output amp, output power, max amp, max power, max length, efficiency, phase shift");
+}
 void TWT::printDataHeader(FILE *file)
 {
-	fprintf(file, "колво периодов, угол[градусы],Ток[A],Hапряжение[кВ],групповая скорость,добротность (периода),входная мощность[Вт],input frequency,output amp, output power, max amp, max power, max length, efficiency, phase shift\n");
+	printParamsHeader(file);
+	printResultHeader(file);
+	fprintf(file, "\n");
 }
 void TWT::generateLongitudinalStructure(double h)
 {
@@ -357,7 +366,9 @@ void TWT::iterate(int paramsInd)
 
 //			double ar, ai;
 			solve(A, ar, ai, inputAmp, lossK, 0, structReal, structIm, G, 0, false, longitudinalStructureRe, longitudinalStructureIm, qStructure, mesh);
+			printCurrentParams(results);
 			printResults(results, A);
+			fprintf(results, "\n");
 		}
 	}
 }
