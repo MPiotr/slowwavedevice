@@ -8,7 +8,13 @@ protected:
 	void changeParam(string, double);
 	void printCurrentParams(FILE * file);
 	void printParamsHeader(FILE *file);
-	double clinotronAngle;
+
+	double clinotronAngle; 
+	Interpolation *clinotronShiftStrRe = NULL;
+	Interpolation *clinotronShiftStrIm = NULL;
+	double *clinotronStructure = NULL;
+
+	void generateClinotronStructure(double h);
 
 	int NumMesh;
 	cplx solveTWT_0d(cplx *A, double *ar, double *ai, double inputAmp, double lossKappa, double delta,

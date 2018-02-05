@@ -1,10 +1,23 @@
 #include "twt_0d.h"
+#include <io.h>
 #include "xml_routines.h"
 
 
 TWT_0D::TWT_0D(QDomDocument *doc) :TWT_1D(doc)
 {
 	if (!setXMLEntry(doc, "clinotronAngle", &clinotronAngle, &iteratedParams, &iteratedNames)) clinotronAngle = 0;
+	char clinotronStructureFile[200];
+	if (setXMLEntry(doc, "clinotronStructureTable", (char*)clinotronStructureFile))
+	{
+		if (_access(clinotronStructureFile, 0) == 0)
+		{
+			FILE *strFile = fopen(clinotronStructureFile, "r");
+			parseTable(strFile, &clinotronShiftStrRe, &clinotronShiftStrIm);
+			fclose(strFile);
+			clinotronStructure = new double[Nmax];
+		}
+
+	}
 }
 
 TWT_0D::TWT_0D(QDomDocument *doc, TWT_0D *instance) : TWT_1D(doc, instance)
@@ -55,4 +68,17 @@ void TWT_0D::printParamsHeader(FILE *file)
 {
 	TWT_1D::printParamsHeader(file);
 	fprintf(file, "%g,", clinotronAngle);
+}
+
+void TWT_0D::generateClinotronStructure(double h)
+{
+	if (clinotronStructure == NULL) return;
+	double La = Nperiods*period*h;
+	double dz = Lmax / double(Nmax);
+	int Nstop = ceil(La / dz);
+	for (int i = 0; i < Nmax; i++)
+	{
+		double hz = i*dz;
+		clinotronStructure[i] = clinotronShiftStrRe->at(hz / h);
+	}
 }

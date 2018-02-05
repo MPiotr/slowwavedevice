@@ -372,6 +372,8 @@ std::complex<double>  TWT_0D::solveTWT_0d(std::complex<double>  *A, double *Ar, 
 		return 0;
 	}
 
+	if (clinotronStructure) generateClinotronStructure(h);
+
 	for (int i = 0; i < Nstop; i++)
 	{
 
@@ -380,8 +382,8 @@ std::complex<double>  TWT_0D::solveTWT_0d(std::complex<double>  *A, double *Ar, 
 			z = double(i)*dz + K[k] * dz;
 			if (lStrRe) coupl = (1. - K[k])*lStrRe[i] + K[k] * lStrRe[i + 1]; else coupl = 1;
 			if (qStr) loss = lossKappa / ((1. - K[k])*qStr[i] + K[k] * qStr[i + 1]); else loss = lossKappa;
+			if (clinotronStructure) Rshift = (1. - K[k])*clinotronStructure[i] + K[k] * clinotronStructure[i + 1];  else Rshift = -z*clinotronAngle;
 			if (!isfinite(loss)) loss = lossKappa;
-			Rshift = -z*clinotronAngle;
 			particleStep << <motiongrid, motionwarp >> >(d_par, d_fAr, d_fAi, i, k, K[k], coupl, Rshift);
 			amplitudeStep << <1, gridsize >> >(d_par, i, k, K[k], loss);
 

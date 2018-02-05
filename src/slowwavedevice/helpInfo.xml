@@ -9,6 +9,7 @@
    <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)</beamWidth>
    <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)</beamHeight>
    <angle unit = "degree">Угол синхронизма в градусах (неактивен, если задано dispersionFileName)</angle>
+   <clinotronAngle iterable ="0">Задает угол наклона пучка</clinotronAngle>"
   </beam>
   <wave>
   <frequency iterable = "0" unit = "GHz">Частота входного сигнала, ГГц</frequency>

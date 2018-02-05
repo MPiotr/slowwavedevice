@@ -283,7 +283,6 @@ void TWT::generateQStructure(double h)
 		double hz = i*dz;
 		qStructure[i] = qStructRe->at(hz / h);
 	}
-
 }
 double TWT::solveTWT()
 {

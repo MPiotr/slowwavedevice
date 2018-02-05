@@ -127,4 +127,9 @@
   <ItemGroup>
     <ResourceCompile Include="slowwavedevice.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="helpInfo.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>

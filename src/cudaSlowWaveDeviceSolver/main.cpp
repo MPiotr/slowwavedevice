@@ -403,7 +403,7 @@ int startXML(int argc, char *argv[])
 			}
 		}
 		else 
-			_chdir("F:\\Piotr\\CalcData\\verifiedCpy\\260GHz_bwo_axial_twt0d");
+			_chdir("F:\\Piotr\\CalcData\\verifiedCpy\\95GHz_bwo_axial_twt0d_complexClinotron");
 
 		QFile file("input.xml");
 		if (!file.open(QIODevice::ReadOnly))
