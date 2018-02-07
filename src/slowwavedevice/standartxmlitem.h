@@ -5,6 +5,7 @@
 #include <qstandarditemmodel.h>
 #include <QDomDocument>
 
+
 class StandardXMLItem : public QStandardItem
 {
 //	Q_OBJECT
@@ -22,5 +23,5 @@ public:
 private:
 		
 };
-
+Q_DECLARE_METATYPE(StandardXMLItem)
 #endif // STANDARTXMLITEM_H

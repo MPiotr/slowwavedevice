@@ -5,24 +5,34 @@
 projectviewer::projectviewer()
 	: QStandardItemModel()
 {
-	QString cwd = QDir::current().absolutePath();
-	QFile input("helpInfo.xml");
-	if (!input.open(QIODevice::ReadOnly)){
-		return;
-	}
-	QString err_msg; int err_line; int err_column;
-	bool readhelp =  toolTipsXML.setContent(&input, &err_msg, &err_line, &err_column);
-	if (!readhelp)
+
+	QString err_msg;
+	int err_line, err_column;
+	toolTipsXML = new QDomDocument();
+	if (!openHelperXML(toolTipsXML, &err_msg, &err_line, &err_column))
 	{
 		emit(errorOpeningFile(qPrintable(err_msg), err_line, err_column));
 		return;
 	}
-	input.close();
 }
 
 projectviewer::~projectviewer()
 {
 
+}
+
+bool    projectviewer::openHelperXML(QDomDocument* helper, QString *err_msg,  int *err_line, int *err_column){
+	QFile input("helpInfo.xml");
+	if (!input.open(QIODevice::ReadOnly)){
+		*err_msg = "File helpInfo.xml is not available";
+		*err_line = 0;
+		*err_column = 0;
+		return false;
+	}
+
+	bool readhelp = helper->setContent(&input, err_msg, err_line, err_column);
+	input.close();
+	return readhelp;
 }
 
 void projectviewer::setprojContent(QFile* input)
@@ -56,9 +66,10 @@ void projectviewer::setprojContent(QFile* input)
 // ----------
 
 }
-void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1)
+void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1) //Adds only one node without recuresion. Used for toggling iterate
 {
 	QString elementName = node->nodeName();
+	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
 
 	StandardXMLItem *  thisItemName = new StandardXMLItem(elementName, *node);
 	thisItemName->setEditable(false);
@@ -106,10 +117,11 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 	QString elementValue = node->toElement().text();
 	StandardXMLItem *  thisItemValue = new StandardXMLItem(elementValue);
 	thisItemValue->setEditable(true);
+
 	
 	if (elementName != QString("#comment"))
 	{
-		QDomNodeList tooltips = toolTipsXML.elementsByTagName(thisItemName->nodeName);
+		QDomNodeList tooltips = toolTipsXML->elementsByTagName(thisItemName->nodeName);
 		if (!tooltips.isEmpty())
 		{
 			QString  nodevalue = tooltips.item(0).toElement().firstChild().nodeValue();
@@ -172,14 +184,20 @@ void projectviewer::showContextMenu(QTreeView *view, QModelIndex index, QPoint p
 {
 	
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(index);
-	QDomElement current = currentItem->node.toElement();
+	QString elementName = currentItem->nodeName;
+	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
+
+	QDomElement current = helperNode.toElement(); //  currentItem->node.toElement();
 	QString iterable = current.attribute("iterable");
+
+	QDomNode itemNode = currentItem->node;
+	QString iterableItem = itemNode.toElement().attribute("iterable");
 
 	if (iterable == "0" || iterable == "1")
 	{
 		QMenu contextMenu(view);
 		QString text;
-		if (iterable == "0") text = "iterate value";
+		if (iterableItem == "0") text = "iterate value";
 		else text = "single value";
 		projviewMenuAction	action(text, &index, &contextMenu);
 		contextMenu.addAction(&action);
@@ -374,7 +392,7 @@ void projectviewer::toggleIterate(QModelIndex* index)
 		QDomNode  parent = node.parentNode();
 		QString name = node.nodeName();
 
-		if (iterable == "0")
+		if (iterable == "0" || iterable == NULL)
 		{
 			QString fromText = current.text();
 			QDomNode newFrom = doc.createElement("from");

@@ -26,6 +26,9 @@ public:
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
 	double period;	
 	QTextBrowser *debugBrowser;
+	QDomDocument *toolTipsXML;
+
+	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);
 public slots:
 	void itemChanged(QModelIndex);
 	void itemClicked(QModelIndex);
@@ -36,9 +39,10 @@ signals:
 	void voltageChanged(QString newvalue);
 	void setVisiblePlot(int plotNum);
 
+	
+
 private:
-	QDomDocument doc; 
-	QDomDocument toolTipsXML;
+	QDomDocument doc; 	
 	void addNode(QDomNode *, QStandardItem  *);
 	void addOnlyNode(QDomNode *, QStandardItem  *, int );
 
