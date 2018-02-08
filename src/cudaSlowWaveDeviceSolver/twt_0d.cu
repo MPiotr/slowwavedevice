@@ -80,7 +80,7 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, dou
 	double decayFactor = par->g1;
 	int N = par->Nz;
 	double dz = par->L / (double)N;
-	double en0 = sqrt(pow(1. + voltage / 511., 2) - v_trans*v_trans);
+	double en0 = 1. + voltage / 511.;
 	// .... get acess to values arrays..................
 	double *d_Qk = par->Qk;   double *d_Wk = par->Wk;   //k - компоненты фазы и энергии
 	double *Q0 = par->Q0;   double *W0 = par->W0;   //фаза and энергия
@@ -111,7 +111,6 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, dou
 		W = 0;
 		Q0[gstride + xi] = Q;
 		W0[gstride + xi] = W;
-
 	}
 	// ....... at the left end of the space, set HF current to zero
 	if ((i == 0) && (xi == 0))
@@ -150,7 +149,7 @@ __global__ void particleStep(PAR *par, double *Ar, double *Ai, int i, int k, dou
 
 
 	//...........Уравнения движения определены здесь...............................
-	double DQ = (1. - (k1 / h)*EN / sqrt(EN*EN - 1.));
+	double DQ = (1. - (k1 / h)*EN / sqrt(EN*EN*(1. - v_trans*v_trans) - 1.));
 	double reF = frA*cosPH - fiA*sinPH;
 	double imF = frA*sinPH + fiA*cosPH;
 	Qk = dz*DQ;
