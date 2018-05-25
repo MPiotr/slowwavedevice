@@ -84,7 +84,7 @@ struct ParamsM
 };
 #endif
 
-class Multiplier
+class Device
 {
 protected:
 	const static int NV = 4;
@@ -220,10 +220,10 @@ protected:
 
 public:
 
-	Multiplier ();
-	Multiplier (QDomDocument* doc);
+	Device ();
+	Device (QDomDocument* doc);
 	
-//	~Multiplier();
+//	~Device();
 
 	double A0, B0;
 

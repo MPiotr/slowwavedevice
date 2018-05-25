@@ -1,9 +1,9 @@
-#include "Multiplier.h"
+#include "device.h"
 #include <QtCore\qsharedmemory.h>
 
 #ifndef __TWT_H
 #define __TWT_H
-class TWT :public Multiplier
+class TWT :public Device
 {
 protected:
 //	vector<BWO_2D> parasites;

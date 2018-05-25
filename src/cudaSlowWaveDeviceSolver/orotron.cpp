@@ -1,10 +1,10 @@
 #include "orotron.h"
 
-Orotron::Orotron() :Multiplier()
+Orotron::Orotron() :Device()
 {
 	;
 }
-Orotron::Orotron(QDomDocument *doc) :Multiplier(doc)
+Orotron::Orotron(QDomDocument *doc) : Device(doc)
 {
 	;
 }

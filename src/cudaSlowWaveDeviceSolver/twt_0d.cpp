@@ -53,7 +53,7 @@ void TWT_0D::readTransversalStructure()
 }
 void TWT_0D::changeParam(string	 name, double value)
 {
-	Multiplier::changeParam(name, value);
+	Device::changeParam(name, value);
 	if (name == "clinotronAngle") clinotronAngle = value;
 }
 

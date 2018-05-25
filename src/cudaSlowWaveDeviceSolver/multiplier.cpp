@@ -1,5 +1,5 @@
 #include <io.h>
-#include "Multiplier.h"
+#include "device.h"
 #include "orotron.h"
 #include "Interpolation.h"
 #include "synchronism.h"
@@ -49,7 +49,7 @@ void lsolve(double *X, double *Y, double *dX, int N) // Y dX = X
 }
 
 
-Multiplier::Multiplier()
+Device::Device()
 {
 	solverStatus = 0;
 	fieldLoaded = 0;
@@ -68,7 +68,7 @@ Multiplier::Multiplier()
 
 	
 }
-Multiplier::Multiplier(QDomDocument* doc)
+Device::Device(QDomDocument* doc)
 {
 	solverStatus = 0;
 	fieldLoaded = 0;
@@ -204,7 +204,7 @@ Multiplier::Multiplier(QDomDocument* doc)
 }
 
 
-double Multiplier::getHFoutputPower(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma1B, 
+double Device::getHFoutputPower(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma1B,
 									double _voltage, double _inputPower_watts, double _delta, double _Qa, double _Qb, double _wall, double _sQ1, double _sQ3,
 									char *filename, char *comment, double *monitor, char * difrFlag)
 {
@@ -333,7 +333,7 @@ double Multiplier::getHFoutputPower(double _Current_ampers, double _period, int 
 
 
 
-double Multiplier::retriveBPower(cplx B, double omega, double Qb, double NormaB)
+double Device::retriveBPower(cplx B, double omega, double Qb, double NormaB)
 {
 	if(Q_difr < 300) Q_difr = 300;
 	double Qfull = Q_difr*Qb/(Q_difr + Qb);
@@ -341,7 +341,7 @@ double Multiplier::retriveBPower(cplx B, double omega, double Qb, double NormaB)
 	double outputPower = electronPower*Qb/(Qb + Q_difr);
 	return outputPower; 
 }
-double Multiplier::findAstat(double nextA, int N_it, double G, double *resS)
+double Device::findAstat(double nextA, int N_it, double G, double *resS)
 {
 	double A0, A1;
 	double F0, F1;
@@ -398,7 +398,7 @@ double Multiplier::findAstat(double nextA, int N_it, double G, double *resS)
 	return nextA;
 
 }
-double Multiplier::findAstatDetuned(double nextA, int N_it, double G, double Sin)
+double Device::findAstatDetuned(double nextA, int N_it, double G, double Sin)
 {
 	cplx A00, A01, A10; 
 	cplx F00, F01, F10;
@@ -475,7 +475,7 @@ double Multiplier::findAstatDetuned(double nextA, int N_it, double G, double Sin
 
 }
 
-double Multiplier::findAstatDetuned_full(double nextA, int N_it, double G)
+double Device::findAstatDetuned_full(double nextA, int N_it, double G)
 {
 	cplx A00, A01, A10;
 	cplx F00, F01, F10;
@@ -551,7 +551,7 @@ double Multiplier::findAstatDetuned_full(double nextA, int N_it, double G)
 	return  X[2];//abs(X[0] + I*X[1]);
 }
 
-cplx Multiplier::FindBstat(cplx b0, int Nb_it,  double Gb, double Astat)
+cplx Device::FindBstat(cplx b0, int Nb_it, double Gb, double Astat)
 {
 
 	double xi = 0.001;
@@ -630,7 +630,7 @@ cplx Multiplier::FindBstat(cplx b0, int Nb_it,  double Gb, double Astat)
 	}
 	return B00;
 }
-cplx Multiplier::FindBstatDetuned(cplx b0, int Nb_it, double Gb, double Astat)
+cplx Device::FindBstatDetuned(cplx b0, int Nb_it, double Gb, double Astat)
 {
 
 	double xi = 0.001;
@@ -677,7 +677,7 @@ cplx Multiplier::FindBstatDetuned(cplx b0, int Nb_it, double Gb, double Astat)
 	}
 	return B00;
 }
-double Multiplier::ElectronsDeltaEnergy(double A)
+double Device::ElectronsDeltaEnergy(double A)
 {
 	double res = 0;
 	if(strcmp(solverName,"multiplier") == 0 )  return DeltaEnergy(A); 
@@ -685,21 +685,21 @@ double Multiplier::ElectronsDeltaEnergy(double A)
 	return res;
 		  
 }
-cplx Multiplier::ElectronCurrentA(double reA, double imA)
+cplx Device::ElectronCurrentA(double reA, double imA)
 {
 	cplx res = 0;
 	if(strcmp(solverName,"multiplier") == 0 )  return CurrentA(reA, imA); 
 	return res;
 
 }
-cplx Multiplier::HfElectronCurrent(double rB, double iB, double Astat)
+cplx Device::HfElectronCurrent(double rB, double iB, double Astat)
 {
 	cplx res = 0;
 	if(strcmp(solverName,"multiplier") == 0) return CurrentB(rB, iB, Astat); 
 	return res;
 
 }
-void Multiplier::PrintParams(char *filename, char *comment)
+void Device::PrintParams(char *filename, char *comment)
 {
 	FILE *file2=  fopen(filename, "w"); 
 	
@@ -719,7 +719,7 @@ void Multiplier::PrintParams(char *filename, char *comment)
 	fclose(file2);
 }
 
-double Multiplier::diffractionQ(char *difrQflag)
+double Device::diffractionQ(char *difrQflag)
 {
 	sprintf(difractionFlag, "%s", difrQflag);
 	if(strcmp(difrQflag,"Ohm") == 0 )  return Qb; 
@@ -732,20 +732,20 @@ double Multiplier::diffractionQ(char *difrQflag)
 
 
 }
-void Multiplier::setCurrent(double curr)
+void Device::setCurrent(double curr)
 {
 	Current_ampers = curr;
 }
-double Multiplier::paramG()
+double Device::paramG()
 {
 	return Current_ampers / 17045.*1. / (k1*Norma); //k1 β μμ^{-1}, Norma β μμ^3.
 }
-double Multiplier::power(double kpd)
+double Device::power(double kpd)
 {
 	return voltage*Current_ampers*kpd;
 
 }
-void Multiplier::changeParam(string name, double par)
+void Device::changeParam(string name, double par)
 {
 	if (name == "voltage") {
 		voltage = par;

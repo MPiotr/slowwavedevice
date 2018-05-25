@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <complex>
-#include "Multiplier.h"
+#include "device.h"
 #include "cu_mult.h"
 //#include "print.h"
   
@@ -1147,7 +1147,7 @@ MotionEquationMultiplierMultiModes(PAR par, double Lstop, int Nharm, int Na, dou
 
 }
 
-std::complex<double> Multiplier::retriveBCurr()
+std::complex<double> Device::retriveBCurr()
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1173,7 +1173,7 @@ std::complex<double> Multiplier::retriveBCurr()
 	return res;
 
 }
-void Multiplier::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2)
+void Device::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2)
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1210,7 +1210,7 @@ void Multiplier::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2
 
 
 }
-double Multiplier::retriveDeltaEnergy()
+double Device::retriveDeltaEnergy()
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1241,7 +1241,7 @@ double Multiplier::retriveDeltaEnergy()
 
 }
 
-bool Multiplier::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
+bool Device::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
 {
 	Nz = nz;
 	Lsolver = lsolver;
@@ -1289,7 +1289,7 @@ bool Multiplier::initMultiplierSolver(int nz, double lsolver, double groupSpeedC
 	return 1;
 }
 
-void Multiplier::releaseMultiplierMemory()
+void Device::releaseMultiplierMemory()
 {
 
 	cudaFree((void*)d_Nz);
@@ -1307,7 +1307,7 @@ void Multiplier::releaseMultiplierMemory()
 }
 
 
-double Multiplier::DeltaEnergy(double A)
+double Device::DeltaEnergy(double A)
 {
 	PAR par;
 	double d = period;
@@ -1374,7 +1374,7 @@ double Multiplier::DeltaEnergy(double A)
 
 
 }
-std::complex<double> Multiplier::CurrentB(double  reB, double imB, double A)
+std::complex<double> Device::CurrentB(double  reB, double imB, double A)
 {
 	PAR par;
 	double d = period;
@@ -1442,7 +1442,7 @@ std::complex<double> Multiplier::CurrentB(double  reB, double imB, double A)
 
 
 }
-std::complex<double> Multiplier::CurrentB2(double  reB, double imB, double A, cplx A2)
+std::complex<double> Device::CurrentB2(double  reB, double imB, double A, cplx A2)
 {
 	PAR par;
 	double d = period;
@@ -1476,7 +1476,7 @@ std::complex<double> Multiplier::CurrentB2(double  reB, double imB, double A, cp
 	return retriveBCurr();
 }
 
-std::complex<double> Multiplier::CurrentA(double  reA, double imA)
+std::complex<double> Device::CurrentA(double  reA, double imA)
 {
 	PAR par;
 
@@ -1523,7 +1523,7 @@ std::complex<double> Multiplier::CurrentA(double  reA, double imA)
 
 
 }
-std::complex<double> Multiplier::CurrentA2(double A1, double  reA, double imA)
+std::complex<double> Device::CurrentA2(double A1, double  reA, double imA)
 {
 	PAR par;
 
@@ -1563,7 +1563,7 @@ std::complex<double> Multiplier::CurrentA2(double A1, double  reA, double imA)
 
 }
 
-void Multiplier::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<double> * currs, double *buffRe, double *buffIm, int Na, cplx *J1, cplx *J2)
+void Device::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<double> * currs, double *buffRe, double *buffIm, int Na, cplx *J1, cplx *J2)
 {
 	PAR par;
 
@@ -1601,7 +1601,7 @@ void Multiplier::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<do
 	retriveACurrComplex((std::complex<double>*)Amps, currs, buffRe, buffIm, Namm, Nstop);
 
 }
-void  Multiplier::retriveACurrComplex(std::complex<double>  *Amps, std::complex<double>  *currs, double *currsBuffRe, double *currsBuffIm, int Na, int Nstop)
+void  Device::retriveACurrComplex(std::complex<double>  *Amps, std::complex<double>  *currs, double *currsBuffRe, double *currsBuffIm, int Na, int Nstop)
 {
 	int GQ = Nq / NQ; int GS = Ns / NS; int GV = Nv;
 
@@ -1653,7 +1653,7 @@ void  Multiplier::retriveACurrComplex(std::complex<double>  *Amps, std::complex<
 
 //////////////////////////////////
 
-ParamsM Multiplier::setPar()
+ParamsM Device::setPar()
 {
 	ParamsM par;
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;

@@ -1,4 +1,4 @@
-#include"Multiplier.h"
+#include"device.h"
 #include <QtCore\qsharedmemory.h>
 #include <QtCore\qbuffer.h>
 #include <QtCore\qdatastream.h>

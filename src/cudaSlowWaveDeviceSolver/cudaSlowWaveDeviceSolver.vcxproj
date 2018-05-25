@@ -27,7 +27,7 @@
     <ClInclude Include="orotron.h" />
     <ClInclude Include="synchronism.h" />
     <ClInclude Include="Interpolation.h" />
-    <ClInclude Include="Multiplier.h" />
+    <ClInclude Include="device.h" />
     <ClInclude Include="twt.h" />
     <ClInclude Include="twt_0d.h" />
     <ClInclude Include="twt_1d.h" />
@@ -38,6 +38,7 @@
     <CudaCompile Include="multiplier.cu" />
     <CudaCompile Include="multiplier_spcharge.cu" />
     <CudaCompile Include="multiplier_spcharge_2d.cu" />
+    <CudaCompile Include="solvers_common.cu" />
     <CudaCompile Include="twt_0d.cu" />
     <CudaCompile Include="twt_1d.cu" />
     <CudaCompile Include="twt_bwo_2d.cu" />

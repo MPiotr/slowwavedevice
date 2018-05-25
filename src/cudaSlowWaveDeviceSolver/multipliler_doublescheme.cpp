@@ -1,8 +1,8 @@
-#include "Multiplier.h"
+#include "device.h"
 #include "cu_mult.h"
 
 
-double Multiplier::getHFoutputPowerDoubleScheme(double _Current_ampers, double _period, int _Nperiods, double _Ld1, double _Ld2, double _La2, double _Lb, double _k1, double _Norma, double Norma1B,  double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb,  double _wall, char *filename, char *comment)
+double Device::getHFoutputPowerDoubleScheme(double _Current_ampers, double _period, int _Nperiods, double _Ld1, double _Ld2, double _La2, double _Lb, double _k1, double _Norma, double Norma1B, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
 {
 
 	Current_ampers = _Current_ampers;   Ld1 = _Ld1; Ld2 = _Ld2; La2 = _La2; Lb = _Lb;
@@ -77,7 +77,7 @@ double Multiplier::getHFoutputPowerDoubleScheme(double _Current_ampers, double _
 
 }
 
-cplx Multiplier::findAstatDoubleScheme(double nextA, int N_it, double G1, double G2)
+cplx Device::findAstatDoubleScheme(double nextA, int N_it, double G1, double G2)
 {
 	double omega = k1*(10.*c);
 																/////////
@@ -154,7 +154,7 @@ cplx Multiplier::findAstatDoubleScheme(double nextA, int N_it, double G1, double
 
 }
 
-cplx Multiplier::FindBstatDoubleScheme(cplx b0, int Nb_it,  double Gb, double Astat, cplx A2_stat)
+cplx Device::FindBstatDoubleScheme(cplx b0, int Nb_it, double Gb, double Astat, cplx A2_stat)
 {
 
 	double xi = 0.001;
@@ -222,7 +222,7 @@ cplx Multiplier::FindBstatDoubleScheme(cplx b0, int Nb_it,  double Gb, double As
 	return B00;
 }
 
-void Multiplier::PrintParamsDoubleScheme(char *filename, char *comment)
+void Device::PrintParamsDoubleScheme(char *filename, char *comment)
 {
 	FILE *file2=  fopen(filename, "w"); 
 	

@@ -1,7 +1,7 @@
  #define lapack_complex_float std::complex<float>
  #define lapack_complex_double std::complex<double>
 
-#include "Multiplier.h"
+#include "device.h"
 #include <mkl.h>
 //#include <blas.h>
 #include "cu_mult.h"
@@ -47,7 +47,7 @@ void lsolve(double *X, double *Y, double *dX) // Y dX = X
 
 }
 
-double Multiplier::getHFoutputPowerMultiModes(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma2, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
+double Device::getHFoutputPowerMultiModes(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma2, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
 {
 
 	Current_ampers = _Current_ampers;   Ld1= _Ld; Lb = _Lb;
@@ -124,7 +124,7 @@ double Multiplier::getHFoutputPowerMultiModes(double _Current_ampers, double _pe
 
 }
 
-void Multiplier::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
+void Device::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
 {
 	double xi = 0.001;
 	double omega = k1*(10.*c);
@@ -203,7 +203,7 @@ void Multiplier::findAstatMultiModes(double* nextX, int N_it, double G1, double 
 
 }
 
-void Multiplier::PrintParamsMultiModes(char *filename, char *comment)
+void Device::PrintParamsMultiModes(char *filename, char *comment)
 {
 	FILE *file2=  fopen(filename, "w"); 
 	

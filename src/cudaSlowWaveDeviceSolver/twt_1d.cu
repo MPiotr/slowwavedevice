@@ -1,12 +1,13 @@
 #include "cu_mult.h"
 #include "twt_1d.h"
+//#include "solvers_common.cu"
 
 #define PAR ParamsM
 #ifndef dm_Pi
 __device__ const double dm_Pi = 3.141592653589793;
 #endif
 
-
+//extern __device__ void BiAverage(double *A, double *B, int p0, int datasize, int logsize);
 
 static __device__ void biAverage(double *A, double *B, int p0, int datasize, int logsize)
 {
@@ -30,8 +31,6 @@ static __device__ void biAverage(double *A, double *B, int p0, int datasize, int
 		}
 		__syncthreads();
 	}
-
-
 }
 __device__ void findPosition(double *mesh, double x, double* xplus, double* xminus, int *nplus, int *nminus, int N)
 {

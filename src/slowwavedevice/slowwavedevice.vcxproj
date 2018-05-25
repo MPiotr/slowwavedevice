@@ -246,7 +246,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="helpInfo.xml" />
+    <Xml Include="helpInfo.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

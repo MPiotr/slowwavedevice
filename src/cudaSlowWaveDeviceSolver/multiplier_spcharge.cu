@@ -459,7 +459,7 @@ Multipler_SpCharge::Multipler_SpCharge()
 {
 	;
 }
-Multipler_SpCharge::Multipler_SpCharge(QDomDocument *doc) : Multiplier(doc)
+Multipler_SpCharge::Multipler_SpCharge(QDomDocument *doc) : Device(doc)
 {
 	;
 }
@@ -682,7 +682,7 @@ cplx Multipler_SpCharge::ElectronCurrentA(double reA, double imA)
 }
 bool Multipler_SpCharge::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
 {
-	Multiplier::initMultiplierSolver(nz, lsolver, groupSpeedCoeff, _solverName);
+	Device::initMultiplierSolver(nz, lsolver, groupSpeedCoeff, _solverName);
 	int GQ = Nq / NQ; int GS = Ns / NS; int GV = Nv;
 	printf("Allocate space charge arrays ...\n<font color = \"red\">");
 	gpuErrChk(cudaMalloc((void**)&d_Qk, 4 * sizeof(double)*Np*Nq*Ns*Nv))

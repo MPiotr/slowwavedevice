@@ -1123,7 +1123,7 @@ cplx Multiplier_SpCharge_2D::HfElectronCurrent(double  _reB, double _imB, double
 }
 bool Multiplier_SpCharge_2D::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
 {
-	Multiplier::initMultiplierSolver(nz, lsolver, groupSpeedCoeff, _solverName);
+	Device::initMultiplierSolver(nz, lsolver, groupSpeedCoeff, _solverName);
 //	int GQ = Nq / NQ; int GS = Ns / NS; int GV = Nv; //grid dimensions
 	printf("Allocate space charge arrays ...\n<font color = \"red\">");
 	gpuErrChk(cudaMalloc((void**)&d_Qk, 4 * sizeof(double)*Np*Nq*Ns*Nv))

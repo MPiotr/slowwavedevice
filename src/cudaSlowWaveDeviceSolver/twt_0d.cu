@@ -6,7 +6,7 @@
 __device__ const double dm_Pi = 3.141592653589793;
 #endif
 
-static __device__ void biAverage(double *A, double *B, int p0, int datasize, int logsize)
+ static __device__ void biAverage(double *A, double *B, int p0, int datasize, int logsize)
 {
 	int stride = datasize;
 	for (int q = 1; q <= logsize; q++)

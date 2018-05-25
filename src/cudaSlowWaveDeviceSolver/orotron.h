@@ -1,7 +1,7 @@
-#include "Multiplier.h"
+#include "device.h"
 #ifndef OROTRON__H
 #define OROTRON__H
-class Orotron : public Multiplier
+class Orotron : public Device
 {
 	void iterate(int);
 	void printResultOrotron(FILE *file, double kpd);

@@ -1,7 +1,7 @@
-#include "Multiplier.h"
+#include "device.h"
 #ifndef	__MULTIPLIER_SPCHARGE_H
 #define __MULTIPLIER_SPCHARGE_H
-class Multipler_SpCharge : public Multiplier
+class Multipler_SpCharge : public Device
 {
 	double ElectronsDeltaEnergy(double _A);
 	cplx ElectronCurrentA(double reA, double imA);

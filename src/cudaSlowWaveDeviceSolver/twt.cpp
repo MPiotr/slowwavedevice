@@ -21,7 +21,7 @@ void parseTable(FILE *fieldFile, Interpolation **structReal, Interpolation **str
 	*structImag = new Interpolation(struct1d_y.data(), struct1d_fieldIm.data(), size);
 }
 
-TWT::TWT(QDomDocument *doc) : Multiplier(doc)
+TWT::TWT(QDomDocument *doc) : Device(doc)
 {
 	initSolver(Nmax, Lmax);
 
@@ -106,7 +106,7 @@ TWT::TWT(QDomDocument *doc) : Multiplier(doc)
 
 
 }
-TWT::TWT(QDomDocument *doc, int a) : Multiplier(doc)
+TWT::TWT(QDomDocument *doc, int a) : Device(doc)
 {
 
 	if (inputPower_watts == 0) {

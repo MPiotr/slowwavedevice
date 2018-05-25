@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <complex>
-#include "Multiplier.h"
+#include "device.h"
 #include "twt_2d.h"
 
 //#include "cu_mult.h"
