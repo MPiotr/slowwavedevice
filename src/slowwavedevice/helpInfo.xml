@@ -5,10 +5,16 @@
    <voltage iterable="0"  unit="kV" usage = "always">Напряжение между катодом и анодом, кВ</voltage>
    <current iterable="0"  unit="A"  usage = "always">Электронный ток,А</current>
    <height unit="mm">Какая-то высота в миллиметрах</height>
-   <beamStructureGap unit="mm">Зазор между структурой и пучком в миллиметрах (неактивена, если задано fieldFileName)</beamStructureGap>
-   <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)</beamWidth>
-   <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)</beamHeight>
-   <angle unit = "degree">Угол синхронизма в градусах (неактивен, если задано dispersionFileName)</angle>
+   <beamStructureGap unit="mm"> Зазор между структурой и пучком в миллиметрах (неактивена, если задано fieldFileName)
+     <disabledby value="fieldFileName"/>
+   </beamStructureGap>
+   <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)
+   <disabledby value="fieldFileName"/>
+   </beamWidth>
+   <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)
+   <disabledby value="fieldFileName"/>
+   </beamHeight>
+   <angle unit = "degree">Угол синхронизма в градусах (если задано dispersionFileName используется как начальная точка для итераций)</angle>
    <clinotronAngle iterable ="0">Задает угол наклона пучка</clinotronAngle>
    <clinotronStructureTable>Файл со смещением траетории пучка относительно катода, в зависимости от продольной координаты. Формат CSV, три колонки  z,dr,0</clinotronStructureTable>
   </beam>
@@ -26,7 +32,9 @@
     <boundaryReflection usage = "BWO" unit = "none">Для лампы обратной волны: коэффициент отражения по амплитуде от коллекторного конца</boundaryReflection>
     <boundaryReflectionPhase usage = "BWO">Для лампы обратной волны: фаза коэффициента отражения по амплитуде от коллекторного конца</boundaryReflectionPhase>
     <structureWidth unit="mm">Ширина структуры (неактивена, если задано fieldFileName)</structureWidth>
-    <groupSpeed>Групповая скорость волны (не активна, если дисперсионная зависимость задана файлом)</groupSpeed>
+    <groupSpeed>Групповая скорость волны (не активна, если дисперсионная зависимость задана файлом)
+    <disabledby value="dispersionFileName" />
+    </groupSpeed>
     <fieldFileName type="filename" usage = "fieldFileName OR periodNorma">Имя файла с поперечной структурой поля; csv формат</fieldFileName>
     <dispersionFileName type="filename" usage = "dispersionFileName OR (frequency AND angle)">Имя файла с дисперсионной характеристикой - зависимоть частоты волны, в ГГц, от набега фазы на одном периоде, в градусах, в виде csv файла, лежащего в рабочей директории</dispersionFileName>
     <logitudinalStructureFile type="filename" usage="optionally">Продольный профиль синхронной гармоник</logitudinalStructureFile>
