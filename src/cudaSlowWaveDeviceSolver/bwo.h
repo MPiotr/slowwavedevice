@@ -10,7 +10,7 @@ class BWO : public TWTsolver
 	double delta;
 	double reflectionCoeff, reflectionPhase;
 	int parasiteIndex;
-	void iterate(int paramsInd);
+	virtual void iterate(int paramsInd);
 	void printResults(FILE *file);
 	void printResultsStartCurrent(FILE *file);
 	void printDataHeader(FILE *file);

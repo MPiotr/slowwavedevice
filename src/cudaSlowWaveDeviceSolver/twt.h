@@ -17,7 +17,7 @@ protected:
 		double *fieldStructureRe, double *fieldStructureIm, double G,
 		double enPrint, bool printField = false,
 		double *longStrRe = NULL, double *longStrIm = NULL, double *qStr = NULL, double *mesh = NULL) = 0; //решает уравнения для ЛБВ
-	void iterate(int);
+	virtual void iterate(int);
 
 	virtual void readTransversalStructure() = 0;
 	void generateLongitudinalStructure(double h);

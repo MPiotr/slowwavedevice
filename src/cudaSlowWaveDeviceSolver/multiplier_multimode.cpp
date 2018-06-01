@@ -2,8 +2,9 @@
  #define lapack_complex_double std::complex<double>
 
 #include "device.h"
+#include "multiplier_multimode.h"
+#include "xml_routines.h"
 #include <mkl.h>
-//#include <blas.h>
 #include "cu_mult.h"
 
 
@@ -47,7 +48,12 @@ void lsolve(double *X, double *Y, double *dX) // Y dX = X
 
 }
 
-double Device::getHFoutputPowerMultiModes(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma2, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
+MultiplierMultiModes::MultiplierMultiModes(QDomDocument * doc) :Multiplier(doc)
+{
+	setXMLEntry(doc, "beamStructureGap", &Namm);					//Количиество учитываемых продольных мод (multimode oro)
+}
+
+double MultiplierMultiModes::getHFoutputPowerMultiModes(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma2, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
 {
 
 	Current_ampers = _Current_ampers;   Ld1= _Ld; Lb = _Lb;
@@ -123,15 +129,14 @@ double Device::getHFoutputPowerMultiModes(double _Current_ampers, double _period
 	return 0.;//outputPower;
 
 }
-
-void Device::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
+void MultiplierMultiModes::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
 {
 	double xi = 0.001;
 	double omega = k1*(10.*c);
-																	/////////
-	double inputPower_dimensionless = inputPower_watts*1.E7/(omega/1.*(m*c*c/e)*(m*c*c/e)*(Current_ampers/17045.)*(1./(k1*10.))); // = S a
-																////////
-	
+	/////////
+	double inputPower_dimensionless = inputPower_watts*1.E7 / (omega / 1.*(m*c*c / e)*(m*c*c / e)*(Current_ampers / 17045.)*(1. / (k1*10.))); // = S a
+	////////
+
 	printf("Qa = %g,\t G = %g,\t inputPowerDimensionless = %g \n", Q, G1, inputPower_dimensionless);
 
 	//FILE *debfile = fopen("d:\\Piotr\\w_orotron_Data\\debug.txt", "w");
@@ -140,60 +145,60 @@ void Device::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
 	double J[25];
 
 	cplx current[6];
-	double X[5]; memcpy(X, nextX, 5*sizeof(double));
+	double X[5]; memcpy(X, nextX, 5 * sizeof(double));
 	double dX[5];
-	X[4] = inputPower_dimensionless/X[0];
+	X[4] = inputPower_dimensionless / X[0];
 	cplx J1 = 0, J2 = 0;
 	cplx cur1[5]; cplx cur2[5];
-	
 
-	for(int i = 0; i < N_it; i++)
+
+	for (int i = 0; i < N_it; i++)
 	{
-	/*	A0 = double(i)/double(N_it)*0.005;
+		/*	A0 = double(i)/double(N_it)*0.005;
 		fprintf(debfile, "%g\t%g\n", A0, DeltaEnergy(A0));*/
 
-		A[0] = -0.5*X[0]/(Qa1) + G1*real(current[0]) + G1*inputPower_dimensionless/(X[0]);
-		A[1] = -0.5*X[1]/(Qa1) + G1*imag(current[0]);
-		A[2] = -0.5*X[2]/(Qa2) + G2*real(current[0]);
-		A[3] = -0.5*X[3]/(Qa2) + G2*imag(current[0]);
-//		A[4] = X[0]*X[4] - inputPower_dimensionless;
+		A[0] = -0.5*X[0] / (Qa1)+G1*real(current[0]) + G1*inputPower_dimensionless / (X[0]);
+		A[1] = -0.5*X[1] / (Qa1)+G1*imag(current[0]);
+		A[2] = -0.5*X[2] / (Qa2)+G2*real(current[0]);
+		A[3] = -0.5*X[3] / (Qa2)+G2*imag(current[0]);
+		//		A[4] = X[0]*X[4] - inputPower_dimensionless;
 
 
-//		CurrentAMultiModes(X, &J1, &J2); поправить. Испортилось после добавления мультимод
-		cur1[0] = J1; cur2[0] = J2; 
+		//		CurrentAMultiModes(X, &J1, &J2); поправить. Испортилось после добавления мультимод
+		cur1[0] = J1; cur2[0] = J2;
 		printf("J:%g, %g\t", abs(J1), abs(J2));
-		for(int a = 0; a < 4; a++)
+		for (int a = 0; a < 4; a++)
 		{
 			double tmp = X[a];
 			X[a] *= (1. + xi);
-//			CurrentAMultiModes(X, &J1, &J2); поправить. Испортилось после добавления мультимод
-			cur1[a+1] = J1;
-			cur2[a+1] = J2;
+			//			CurrentAMultiModes(X, &J1, &J2); поправить. Испортилось после добавления мультимод
+			cur1[a + 1] = J1;
+			cur2[a + 1] = J2;
 			X[a] = tmp;
 		}
-		for(int a = 0; a < 4; a++)
+		for (int a = 0; a < 4; a++)
 		{
-			J[4*0 + a] = -((a == 0)?0.5/Qa1:0) + G1*((a<4)?1./(X[a]*xi):0)*real(cur1[a+1] - cur1[0]) - ((a == 0)?1:0)*G1*inputPower_dimensionless/(X[0]*X[0]);		  //a1'
-			J[4*1 + a] = -((a == 1)?0.5/Qa1:0) + G1*((a<4)?1./(X[a]*xi):0)*imag(cur1[a+1] - cur1[0]);																 //a1''
-			J[4*2 + a] = -((a == 2)?0.5/Qa2:0) + G2*((a<4)?1./(X[a]*xi):0)*real(cur2[a+1] - cur2[0]);																//a2'
-			J[4*3 + a] = -((a == 3)?0.5/Qa2:0) + G2*((a<4)?1./(X[a]*xi):0)*imag(cur2[a+1] - cur2[0]);															   //a2''
-	//		J[5*4 + a] = ((a==4)? X[0]: 0) + ((a==0)? X[4]: 0);											  //s
+			J[4 * 0 + a] = -((a == 0) ? 0.5 / Qa1 : 0) + G1*((a<4) ? 1. / (X[a] * xi) : 0)*real(cur1[a + 1] - cur1[0]) - ((a == 0) ? 1 : 0)*G1*inputPower_dimensionless / (X[0] * X[0]);		  //a1'
+			J[4 * 1 + a] = -((a == 1) ? 0.5 / Qa1 : 0) + G1*((a<4) ? 1. / (X[a] * xi) : 0)*imag(cur1[a + 1] - cur1[0]);																 //a1''
+			J[4 * 2 + a] = -((a == 2) ? 0.5 / Qa2 : 0) + G2*((a<4) ? 1. / (X[a] * xi) : 0)*real(cur2[a + 1] - cur2[0]);																//a2'
+			J[4 * 3 + a] = -((a == 3) ? 0.5 / Qa2 : 0) + G2*((a<4) ? 1. / (X[a] * xi) : 0)*imag(cur2[a + 1] - cur2[0]);															   //a2''
+			//		J[5*4 + a] = ((a==4)? X[0]: 0) + ((a==0)? X[4]: 0);											  //s
 		}
 
 		lsolve(A, J, dX);
-	//	printf("dX:%g, %g, %g, %g\n",  dX[0], dX[1], dX[2], dX[3]);
+		//	printf("dX:%g, %g, %g, %g\n",  dX[0], dX[1], dX[2], dX[3]);
 
-		double absdX = 0; for(int e = 0; e < 4; e++) absdX += dX[e]*dX[e]; absdX = sqrt(absdX);
+		double absdX = 0; for (int e = 0; e < 4; e++) absdX += dX[e] * dX[e]; absdX = sqrt(absdX);
 
 		printf("X:%g, %g, %g, %g \n", X[0], X[1], X[2], X[3]);
-		if(absdX < 1e-20) break;
+		if (absdX < 1e-20) break;
 
-		for(int e = 0; e < 4; e++) X[e] -= dX[e];
+		for (int e = 0; e < 4; e++) X[e] -= dX[e];
 
 	}
 
-	memcpy(nextX,X, 4*sizeof(double));
-	
+	memcpy(nextX, X, 4 * sizeof(double));
+
 
 
 	printf(" 2 q G = %g \n", 2.*Qa1*G1);
@@ -203,14 +208,14 @@ void Device::findAstatMultiModes(double* nextX, int N_it, double G1, double G2)
 
 }
 
-void Device::PrintParamsMultiModes(char *filename, char *comment)
+void MultiplierMultiModes::PrintParamsMultiModes(char *filename, char *comment)
 {
-	FILE *file2=  fopen(filename, "w"); 
-	
-	
+	FILE *file2 = fopen(filename, "w");
+
+
 	fprintf(file2, "\"Current\"\t%g\n\"period\"\t%g\n\"Nper\"\t%i\n", Current_ampers, period, Nperiods);
-	fprintf(file2, "\"ld\"\t%g\n\"kw\"\t%g\n", Ld,  k1);
-	fprintf(file2, "\"lb\"\t%g\n",  Lb);
+	fprintf(file2, "\"ld\"\t%g\n\"kw\"\t%g\n", Ld, k1);
+	fprintf(file2, "\"lb\"\t%g\n", Lb);
 	fprintf(file2, "\"norm1\"\t%g\n\"norm2\"\t%g\n\"p_in\"\t%g\n\"delta_freq\"\t%g\n", Norma, Norma1b, inputPower_watts, delta_freq);
 	fprintf(file2, "\"voltage\"\t%g\n\"Qa1\"\t%g\n\"Qa2\"\t%g\n\"Qb\"\t%g\n", voltage, Qa1, Qa2, Qb);
 	fprintf(file2, "\"beam thickness\"\t%g\n", wall);
@@ -218,4 +223,5 @@ void Device::PrintParamsMultiModes(char *filename, char *comment)
 
 	fclose(file2);
 }
+
 

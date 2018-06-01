@@ -1,7 +1,7 @@
-#include "device.h"
 #ifndef	__MULTIPLIER_SPCHARGE_H
 #define __MULTIPLIER_SPCHARGE_H
-class Multipler_SpCharge : public Device
+#include "multiplier.h"
+class Multipler_SpCharge : public Multiplier
 {
 	double ElectronsDeltaEnergy(double _A);
 	cplx ElectronCurrentA(double reA, double imA);
@@ -11,7 +11,7 @@ class Multipler_SpCharge : public Device
 public:
 	Multipler_SpCharge();
 	Multipler_SpCharge(QDomDocument *doc); 
-	bool initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName);
+	virtual bool initSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName);
 
 };
 #endif

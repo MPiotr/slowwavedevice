@@ -8,6 +8,7 @@
 #include"twt_0d.h"
 #include"bwo.h"
 #include "orotron.h"
+#include "orotron_multimode.h"
 #include "multiplier_spcharge_2d.h"
 #include "Interpolation.h"
 #include "synchronism.h"
@@ -83,11 +84,11 @@ void multiplier()
 	double spchQ1 = 6.83e-5;			//амплитуда пространственного заряда на НЧ; для 1d 3.46e-5; для 2d 2.2e-5
 	double spchQ3 = 6.83e-5;		  	   //амплитуда пространственного заряда на ВЧ;  для 1d 5e-5; для 2d  4.23e-5
 	char solverName[] = "multiplier_spcharge_2d";		//имя солвера "multiplier", "multiplier_spcharge", "multiplier_spcharge_2d"
-	Multiplier_SpCharge_2D sol;
+//	Multiplier_SpCharge_2D sol;  TODO закоментировал - нет пустого конструктора, поправить, позже
 	char difrFlag[] = "Empiric"; //выбор зависимости дифр. добротности от длины: "Ohm","Min", "Empiric"
 	char comment[] = "До 615 в FindBStatDetunded вместо полной стояла\n омическая пересчёт для полной добротности равной половине омической\n Тоже, что в 631, ширина полосы больше плюс смещение по длине";
 
-	sol.initMultiplierSolver(3000, 110, 0., solverName);
+//	sol.initMultiplierSolver(3000, 110, 0., solverName);
 
 	int file_index = 5471;				//Индекс файла с результатами
 
@@ -116,7 +117,7 @@ void multiplier()
 		delta_freq = 0.253;
 //		delta_freq = 0.23 + (0.28-0.23)/15.*(double)u;// + 0.018/double(Ni)*i;;//0.195 + (0.245-0.195)/25.*(double)u;
 		
-		double output_power = sol.getHFoutputPower( current,		 //Ток
+	/*	double output_power = sol.getHFoutputPower( current,		 //Ток
 													period, Nper,	 //период, число периодов первой секции
 													ld, lb,			 //длина дрейфовой секции, длина второй секции
 													kw,				 //волновое число
@@ -130,7 +131,7 @@ void multiplier()
 													file2name,		 //имя файла для печати параметров
 													comment,			//коментарий в файл параметров
 													&inputPow, 
-													difrFlag);		 
+													difrFlag);		 */
 
 	/*	double output_power = sol.getHFoutputPowerDoubleScheme( current,		 //Ток
 													period, Nper,	 //период, число периодов первой секции
@@ -160,23 +161,24 @@ void multiplier()
 
 //		fprintf(file, "%g\t%g\t%g\n", delta_freq, output_power, inputPow);
 //		fprintf(file, "%g\t%g\t%g\n", lb, ld, output_power);
-		fprintf(file, "%g\t%g\t%g\t%g\t%g\n", lb, ld, delta_freq, output_power, inputPow);
+// TODO		fprintf(file, "%g\t%g\t%g\t%g\t%g\n", lb, ld, delta_freq, output_power, inputPow);
 		fflush(file);
 //		fprintf(file, "%g\t%i\t%g\t%g\t%g\n", voltage, Nper, ld2, lb, output_power);
 
 		sprintf(file1, "F:\\Piotr\\Multiplier_260GHz_Data\\currentData\\field1_%i_%i.txt", file_index, i);
 		sprintf(file2, "F:\\Piotr\\Multiplier_260GHz_Data\\currentData\\field3_%i_%i.txt", file_index, i);
-		sol.PrintCurrentsSpaceCharge2D(file1, file2);
+//TODO		sol.PrintCurrentsSpaceCharge2D(file1, file2);
 
 	}
 	fclose(file);
 
 
 
-	sol.releaseMultiplierMemory();
+//TODO	sol.releaseMultiplierMemory();
 	cudaDeviceReset();
 	
 }
+/* TODO default contstuctor
 void orotron()
 {
 
@@ -257,7 +259,7 @@ void orotron()
 													0.  , delta_freq,//входная мощность, и сдвиг частоты
 													Qa, Qb,			 //добротности первой и второй секций
 													wall,			 //расстояние  от  стенки и толщина пучка
-													file2name,	  	 //имя файла для печати параметров*/
+													file2name,	  	 //имя файла для печати параметров
 													comment);	 //коментарий и начальная точка отсчёта	 
 		a00[Ni*j + i] = kpd;
 
@@ -270,7 +272,7 @@ void orotron()
 		double Delta =  1 - kw/(2.*Pi/period*beta);
 		double h = 2*Pi/period;
 
-//		fprintf(file, "%g\t%g\t%g\n", current, voltage, -/*-Qa/Qdifr*/voltage*current*kpd);
+//		fprintf(file, "%g\t%g\t%g\n", current, voltage, -/*-Qa/Qdifr*//*voltage*current*kpd);
 		fprintf(file, "%g\t%g\t\n", voltage, kpd);
 //		Безразмерные величины (нужно значение a_stat)
 //		fprintf(file, "%g\t%g\t%g\t%g\n", sqrt(fabs(astat)*nu*h)*period*double(Nper), (fabs(astat) > 1e-5)? sqrt(h)*Delta/sqrt(fabs(astat)*nu): 0, pow(fabs((astat)), 1.5)*sqrt(h*nu)/(2.*Qa*G), astat);
@@ -284,7 +286,7 @@ void orotron()
 	sol.releaseMultiplierMemory();
 	cudaDeviceReset();
 	
-}
+}*/
 void twt()
 {
 	_chdir("F:\\Piotr\\CalcData\\twt_data");
@@ -544,7 +546,7 @@ void orotron_XML()
 	}
 	file.close();
 
-	Orotron sol;
+	Orotron sol(&doc);
 	int Nmax = doc.elementsByTagName("MaxPointNumber").item(0).toElement().text().toInt();
 	double Lmax = doc.elementsByTagName("MaxLength").item(0).toElement().text().toDouble();
 	double grpSpeedCoeff = doc.elementsByTagName("groupSpeedCoeff").item(0).toElement().text().toDouble();
@@ -567,7 +569,7 @@ void orotron_XML()
 		sprintf(file3name, "unnamedProblem");
 	}
 	
-	sol.initMultiplierSolver(Nmax, Lmax, grpSpeedCoeff, solverName);
+	sol.initSolver(Nmax, Lmax, grpSpeedCoeff, solverName);
 
 
 //	_mkdir("D:\\Piotr\\Multiplier_260GHz_Data");
@@ -677,11 +679,11 @@ void orotron_XML()
 
 
 
-	sol.releaseMultiplierMemory();
+	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
 }
-void multimode_orotron()
+/*void multimode_orotron() TODO: solve problem with default constuctor
 {
 
 	char rootFolder[600], filename[300], file2name[300], file3name[100];
@@ -763,7 +765,7 @@ void multimode_orotron()
 													wall,			 //расстояние  от  стенки и толщина пучка
 												    Time, Namm, initAmpMax,
 													filename,
-													file2name,	  	 //имя файла для печати параметров*/
+													file2name,	  	 //имя файла для печати параметров*//*
 													comment);	 //коментарий и начальная точка отсчёта	 
 		a00[Ni*j + i] = kpd;
 
@@ -776,7 +778,7 @@ void multimode_orotron()
 		double Delta =  1 - kw/(2.*Pi/period*beta);
 		double h = 2*Pi/period;
 
-	//	fprintf(file, "%g\t%g\t%g\n", current, voltage, -/*-Qa/Qdifr*/voltage*current*kpd);
+	//	fprintf(file, "%g\t%g\t%g\n", current, voltage, -/*-Qa/Qdifr*//*voltage*current*kpd);
 //		Безразмерные величины (нужно значение a_stat)
 //		fprintf(file, "%g\t%g\t%g\t%g\n", sqrt(fabs(astat)*nu*h)*period*double(Nper), (fabs(astat) > 1e-5)? sqrt(h)*Delta/sqrt(fabs(astat)*nu): 0, pow(fabs((astat)), 1.5)*sqrt(h*nu)/(2.*Qa*G), astat);
 //		fprintf(file, "%g\t%i\t%g\t%g\t%g\n", voltage, Nper, ld2, lb, output_power);
@@ -789,7 +791,7 @@ void multimode_orotron()
 	sol.releaseMultiplierMemory();
 	cudaDeviceReset();
 	
-}
+}*/
 void multimode_orotronXML(char *inputfilename)
 {
 
@@ -815,7 +817,7 @@ void multimode_orotronXML(char *inputfilename)
  // print out the element names of all elements that are direct children
  // of the outermost element.
 
-	Orotron sol;
+	OrotronMutlimode sol(&doc);
 	int Nmax = doc.elementsByTagName("MaxPointNumber").item(0).toElement().text().toInt();
 	double Lmax = doc.elementsByTagName("MaxLength").item(0).toElement().text().toDouble();
 	double grpSpeedCoeff = doc.elementsByTagName("groupSpeedCoeff").item(0).toElement().text().toDouble();
@@ -840,7 +842,7 @@ void multimode_orotronXML(char *inputfilename)
 	
 
 
-	sol.initMultiplierSolver(Nmax, Lmax, grpSpeedCoeff, solverName);
+	sol.initSolver(Nmax, Lmax, grpSpeedCoeff, solverName);
 
 
 //	_mkdir("D:\\Piotr\\Multiplier_260GHz_Data");
@@ -971,7 +973,7 @@ void multimode_orotronXML(char *inputfilename)
 
 
 
-	sol.releaseMultiplierMemory();
+	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
 }

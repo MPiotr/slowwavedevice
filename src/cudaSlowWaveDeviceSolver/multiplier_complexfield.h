@@ -1,7 +1,7 @@
-#include "device.h"
+#include "multiplier.h"
 #ifndef __MULTIPLIER_COMPLEXFIELD_H
 #define __MULTIPLIER_COMPLEXFIELD_H
-class Multiplier_ComplexField : public Device
+class Multiplier_ComplexField : public Multiplier
 {
 	double ElectronsDeltaEnergy(double _A);
 	cplx ElectronCurrentA(double reA, double imA);
@@ -12,8 +12,8 @@ class Multiplier_ComplexField : public Device
 	cplx CurrentBComplexField(double  _reB, double _imB, double _A);	//ВЧ ток для продольной структуры произвольной формы
 	
 public:
-	Multiplier_ComplexField() : Device() { ; }
-	Multiplier_ComplexField(QDomDocument * doc) : Device(doc) { ; }
+//	Multiplier_ComplexField() : Device() { ; }
+	Multiplier_ComplexField(QDomDocument * doc) : Multiplier(doc) { ; }
 	void loadField(char *filename);
 };
 #endif

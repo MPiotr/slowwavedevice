@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <complex>
-#include "device.h"
+#include "multiplier.h"
+#include "multiplier_three_cavity.h"
+#include "multiplier_multimode.h"
 #include "cu_mult.h"
 //#include "print.h"
   
@@ -69,7 +71,6 @@ MotionEquationMultiplier(PAR *par, double Lstop, int Nharm, double A, double2 B)
 	unsigned int p0 = threadIdx.x;			unsigned int Np = blockDim.x;
 	unsigned int q0 = threadIdx.y;			unsigned int Nq = blockDim.y;
 	unsigned int s0 = threadIdx.z;			unsigned int Ns = blockDim.z;
-
     
 	unsigned int q_init =		 Nq*blockIdx.x + q0;		unsigned int Nq_max =		 Nq*gridDim.x;
 	unsigned int s_init =		 Ns*blockIdx.y + s0;		unsigned int Ns_max =		 Ns*gridDim.y;
@@ -129,10 +130,6 @@ MotionEquationMultiplier(PAR *par, double Lstop, int Nharm, double A, double2 B)
 	double en0 = 1. + voltage/511.;	
 	angle_spread_factor = 1./sqrt(1. + initial_angle*initial_angle);
 																		// Вызывает недопустимую операцию при достаточно больших wall. Наверное из-за резкости параболы в initial_angle
-
-
-
-
 	Q = 2.*dm_Pi/double(Np)*double(p0);
 	W = 0; 
 
@@ -1064,44 +1061,20 @@ MotionEquationMultiplierMultiModes(PAR par, double Lstop, int Nharm, int Na, dou
 		sh_sinQ[xi] = sinPH*fB;
 		sh_cosQ[xi] = cosPH*fB;
 		
-//		unsigned int stride = warpsize;
 
 		__syncthreads();
 		biReduce(sh_sinQ, sh_cosQ, xi, warpsize, log2warpsize);
 	
-/*		for(int q = 1; q <= log2warpsize; q++)
-		{
-			stride = stride >> 1;
-			if(xi < stride)
-			{
-				sh_sinQ[xi] += sh_sinQ[xi + stride];
-			
-			}
-			else
-			{
-				if(xi < 2*stride)
-				{
-					sh_cosQ[xi - stride] += sh_cosQ[xi];
-				}
-			}
-			__syncthreads();
-		}
-	*/	
 		if(xi == 0)
 		{
 			rJ3[X*N+i] =  sh_cosQ[0];	
 			iJ3[X*N+i] =  -sh_sinQ[0];
 
-//			if((i == 1300)) printf("\n%g\n", sh_cosQ[0]);
 
 			int_rJ3 += sh_cosQ[0];
 			int_iJ3 += -sh_sinQ[0];
 		}
 
-
-//		if((q0+p0 == 0)&&(s0 == 0)) printf("%i\t%g\t%g\n", q0, PH, EN);
-
-//		if(q0+p0+s0 == 0) printf("....%i\t", i);
 
 		/////////////////////// усреднение энергии
 		if(i ==  ifinal) 
@@ -1109,16 +1082,6 @@ MotionEquationMultiplierMultiModes(PAR par, double Lstop, int Nharm, int Na, dou
 			sh_sinQ[xi] = W;
 			__syncthreads();
 			biReduce(sh_sinQ, sh_cosQ, xi, warpsize, log2warpsize);
-/*			stride = warpsize;
-			for(int q = 1; q <= log2warpsize; q++)
-			{
-				stride = stride >> 1;//warpsize/roundf(powf(2., q));
-				if(xi < stride)
-				{
-					sh_sinQ[xi] += sh_sinQ[xi + stride];
-				}
-				__syncthreads();
-			}*/
 			if(xi == 0)
 			{	
 				avEN = sh_sinQ[0];
@@ -1147,7 +1110,7 @@ MotionEquationMultiplierMultiModes(PAR par, double Lstop, int Nharm, int Na, dou
 
 }
 
-std::complex<double> Device::retriveBCurr()
+std::complex<double> Multiplier::retriveBCurr()
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1173,7 +1136,7 @@ std::complex<double> Device::retriveBCurr()
 	return res;
 
 }
-void Device::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2)
+void Multiplier::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2)
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1210,7 +1173,7 @@ void Device::retriveBCurr(std::complex<double> *J1, std::complex<double> *J2)
 
 
 }
-double Device::retriveDeltaEnergy()
+double Multiplier::retriveDeltaEnergy()
 {
 	int GQ = Nq/NQ; int GS = Ns/NS; int GV = Nv;
 
@@ -1241,7 +1204,7 @@ double Device::retriveDeltaEnergy()
 
 }
 
-bool Device::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
+bool Device::initSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solverName)
 {
 	Nz = nz;
 	Lsolver = lsolver;
@@ -1289,7 +1252,7 @@ bool Device::initMultiplierSolver(int nz, double lsolver, double groupSpeedCoeff
 	return 1;
 }
 
-void Device::releaseMultiplierMemory()
+void Device::releaseDeviceMemory()
 {
 
 	cudaFree((void*)d_Nz);
@@ -1307,7 +1270,7 @@ void Device::releaseMultiplierMemory()
 }
 
 
-double Device::DeltaEnergy(double A)
+double Multiplier::DeltaEnergy(double A)
 {
 	PAR par;
 	double d = period;
@@ -1320,10 +1283,6 @@ double Device::DeltaEnergy(double A)
 	par.Wmax = d_Wmax; par.Wmin = d_Wmin;
 
 	par.rJ3 = d_rJ3;  par.iJ3 = d_iJ3; 
-
-	
-
-
 
 	par.avEN = d_avEN;
 	par.int_rJ3 = d_int_rJ3;
@@ -1374,7 +1333,7 @@ double Device::DeltaEnergy(double A)
 
 
 }
-std::complex<double> Device::CurrentB(double  reB, double imB, double A)
+std::complex<double> Multiplier::CurrentB(double  reB, double imB, double A)
 {
 	PAR par;
 	double d = period;
@@ -1442,7 +1401,7 @@ std::complex<double> Device::CurrentB(double  reB, double imB, double A)
 
 
 }
-std::complex<double> Device::CurrentB2(double  reB, double imB, double A, cplx A2)
+std::complex<double> MultiplierTreeCavity::CurrentB2(double  reB, double imB, double A, cplx A2)
 {
 	PAR par;
 	double d = period;
@@ -1476,7 +1435,7 @@ std::complex<double> Device::CurrentB2(double  reB, double imB, double A, cplx A
 	return retriveBCurr();
 }
 
-std::complex<double> Device::CurrentA(double  reA, double imA)
+std::complex<double> Multiplier::CurrentA(double  reA, double imA)
 {
 	PAR par;
 
@@ -1523,7 +1482,7 @@ std::complex<double> Device::CurrentA(double  reA, double imA)
 
 
 }
-std::complex<double> Device::CurrentA2(double A1, double  reA, double imA)
+std::complex<double> MultiplierTreeCavity::CurrentA2(double A1, double  reA, double imA)
 {
 	PAR par;
 
@@ -1563,7 +1522,7 @@ std::complex<double> Device::CurrentA2(double A1, double  reA, double imA)
 
 }
 
-void Device::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<double> * currs, double *buffRe, double *buffIm, int Na, cplx *J1, cplx *J2)
+void MultiplierMultiModes::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<double> * currs, double *buffRe, double *buffIm, int Na, cplx *J1, cplx *J2)
 {
 	PAR par;
 
@@ -1601,7 +1560,7 @@ void Device::CurrentAMultiModes(std::complex<double>  *Amps, std::complex<double
 	retriveACurrComplex((std::complex<double>*)Amps, currs, buffRe, buffIm, Namm, Nstop);
 
 }
-void  Device::retriveACurrComplex(std::complex<double>  *Amps, std::complex<double>  *currs, double *currsBuffRe, double *currsBuffIm, int Na, int Nstop)
+void  MultiplierMultiModes::retriveACurrComplex(std::complex<double>  *Amps, std::complex<double>  *currs, double *currsBuffRe, double *currsBuffIm, int Na, int Nstop)
 {
 	int GQ = Nq / NQ; int GS = Ns / NS; int GV = Nv;
 
@@ -1635,7 +1594,7 @@ void  Device::retriveACurrComplex(std::complex<double>  *Amps, std::complex<doub
 		{
 			z = (double)j * dz;
 			sincos(Pi / La*z*double(a - Na / 2), &iF, &rF);
-			J = std::complex<double>(reJ, imJ)*std::complex<double>(rF, -iF);
+			J = cplx(reJ, imJ)*cplx(rF, -iF);
 			currs[a] += (J);
 			//			if(a == 1) fprintf(debugfile, "%g,%g,%g,%g,%g\n",z, real(J)/double(Np*Nq*Ns*Nv), imag(J)/double(Np*Nq*Ns*Nv), abs(J)/double(Np*Nq*Ns*Nv), arg(J) );
 		}

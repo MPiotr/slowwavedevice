@@ -21,10 +21,14 @@
   <ItemGroup>
     <ClInclude Include="bwo.h" />
     <ClInclude Include="cu_mult.h" />
+    <ClInclude Include="multiplier.h" />
     <ClInclude Include="multiplier_complexfield.h" />
+    <ClInclude Include="multiplier_multimode.h" />
     <ClInclude Include="multiplier_spcharge.h" />
     <ClInclude Include="multiplier_spcharge_2d.h" />
+    <ClInclude Include="multiplier_three_cavity.h" />
     <ClInclude Include="orotron.h" />
+    <ClInclude Include="orotron_multimode.h" />
     <ClInclude Include="synchronism.h" />
     <ClInclude Include="Interpolation.h" />
     <ClInclude Include="device.h" />
@@ -45,16 +49,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bwo.cpp" />
+    <ClCompile Include="multiplier.cpp" />
     <ClCompile Include="orotron.cpp" />
+    <ClCompile Include="orotron_multimode.cpp" />
     <ClCompile Include="synchronism.cpp" />
     <ClCompile Include="interpolation.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="multiplier.cpp" />
+    <ClCompile Include="device.cpp" />
     <CudaCompile Include="multiplier_complexfield.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
     <ClCompile Include="multiplier_multimode.cpp" />
-    <ClCompile Include="multipliler_doublescheme.cpp" />
+    <ClCompile Include="multipliler_three_cavity.cpp" />
     <ClCompile Include="twt.cpp" />
     <ClCompile Include="twt_0d.cpp" />
     <ClCompile Include="twt_1d.cpp" />
