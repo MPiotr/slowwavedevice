@@ -207,10 +207,6 @@ double Multiplier::findAstat(double nextA, int N_it, double G, double *resS)
 	return nextA;
 
 }
-void Device::setCurrent(double curr)
-{
-	Current_ampers = curr;
-}
 double Device::paramG()
 {
 	return Current_ampers / 17045.*1. / (k1*Norma); //k1 β μμ^{-1}, Norma β μμ^3.

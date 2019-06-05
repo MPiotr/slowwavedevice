@@ -1093,8 +1093,6 @@ MotionEquationMultiplierMultiModes(PAR par, double Lstop, int Nharm, int Na, dou
 		__syncthreads();
 
 		if(i > ifinal) break;
-	
-
 	}
 
 	__syncthreads();
@@ -1401,7 +1399,7 @@ std::complex<double> Multiplier::CurrentB(double  reB, double imB, double A)
 
 
 }
-std::complex<double> MultiplierTreeCavity::CurrentB2(double  reB, double imB, double A, cplx A2)
+std::complex<double> MultiplierThreeCavity::CurrentB2(double  reB, double imB, double A, cplx A2)
 {
 	PAR par;
 	double d = period;
@@ -1482,7 +1480,7 @@ std::complex<double> Multiplier::CurrentA(double  reA, double imA)
 
 
 }
-std::complex<double> MultiplierTreeCavity::CurrentA2(double A1, double  reA, double imA)
+std::complex<double> MultiplierThreeCavity::CurrentA2(double A1, double  reA, double imA)
 {
 	PAR par;
 

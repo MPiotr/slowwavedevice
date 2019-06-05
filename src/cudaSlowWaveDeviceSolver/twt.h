@@ -5,6 +5,7 @@
 #define __TWT_H
 class TWT :public Device
 {
+	bool initSolver(int nz, double lsolver);
 protected:
 //	vector<BWO_2D> parasites;
 
@@ -35,7 +36,6 @@ protected:
 	double amplitude(double inpPower, double h);
 	double lossKappa(double h);
 
-	bool initSolver(int nz, double lsolver);
 	QSharedMemory *sharedMemory;
 	bool shMemoryCreated = false;
 	void printAbsAtoSharedMemory(int N);

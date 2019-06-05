@@ -3,7 +3,7 @@
 #include "multiplier.h"
 class Multipler_SpCharge : public Multiplier
 {
-	double ElectronsDeltaEnergy(double _A);
+	virtual double ElectronsDeltaEnergy(double _A);
 	cplx ElectronCurrentA(double reA, double imA);
 	double DeltaEnergySpaceCharge(double A);
 	cplx HfElectronCurrent(double  _reB, double _imB, double _A);

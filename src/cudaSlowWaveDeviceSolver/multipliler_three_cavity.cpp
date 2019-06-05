@@ -2,7 +2,7 @@
 #include "cu_mult.h"
 
 
-double MultiplierTreeCavity::getHFoutputPowerDoubleScheme(double _Current_ampers, double _period, int _Nperiods, double _Ld1, double _Ld2, double _La2, double _Lb, double _k1, double _Norma, double Norma1B, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
+double MultiplierThreeCavity::getHFoutputPowerDoubleScheme(double _Current_ampers, double _period, int _Nperiods, double _Ld1, double _Ld2, double _La2, double _Lb, double _k1, double _Norma, double Norma1B, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment)
 {
 
 	Current_ampers = _Current_ampers;   Ld1 = _Ld1; Ld2 = _Ld2; La2 = _La2; Lb = _Lb;
@@ -39,7 +39,7 @@ double MultiplierTreeCavity::getHFoutputPowerDoubleScheme(double _Current_ampers
 	if(k0 == k1)
 		A2_stat = findAstatDoubleScheme(nextA, N_it, G1, G2);
 	else
-	{	printf("\n Error: detuned mode is not yet written\n"); return 0;}
+	{	printf("\n Error: detuned mode is not yet implemented\n"); return 0;}
 
 	double NormaB = Norma1b*Lb/(2.*0.28);
 	double Gb = Current_ampers/17045.*1./(3.*k1*NormaB);
@@ -77,7 +77,7 @@ double MultiplierTreeCavity::getHFoutputPowerDoubleScheme(double _Current_ampers
 
 }
 
-cplx MultiplierTreeCavity::findAstatDoubleScheme(double nextA, int N_it, double G1, double G2)
+cplx MultiplierThreeCavity::findAstatDoubleScheme(double nextA, int N_it, double G1, double G2)
 {
 	double omega = k1*(10.*c);
 																/////////
@@ -154,7 +154,7 @@ cplx MultiplierTreeCavity::findAstatDoubleScheme(double nextA, int N_it, double 
 
 }
 
-double MultiplierTreeCavity::retriveBPower(cplx B, double omega, double Qb, double NormaB)
+double MultiplierThreeCavity::retriveBPower(cplx B, double omega, double Qb, double NormaB)
 {
 	if (Q_difr < 300) Q_difr = 300;
 	double Qfull = Q_difr*Qb / (Q_difr + Qb);
@@ -163,7 +163,7 @@ double MultiplierTreeCavity::retriveBPower(cplx B, double omega, double Qb, doub
 	return outputPower;
 }
 
-cplx MultiplierTreeCavity::FindBstatDoubleScheme(cplx b0, int Nb_it, double Gb, double Astat, cplx A2_stat)
+cplx MultiplierThreeCavity::FindBstatDoubleScheme(cplx b0, int Nb_it, double Gb, double Astat, cplx A2_stat)
 {
 
 	double xi = 0.001;
@@ -231,7 +231,7 @@ cplx MultiplierTreeCavity::FindBstatDoubleScheme(cplx b0, int Nb_it, double Gb, 
 	return B00;
 }
 
-void MultiplierTreeCavity::PrintParamsDoubleScheme(char *filename, char *comment)
+void MultiplierThreeCavity::PrintParamsDoubleScheme(char *filename, char *comment)
 {
 	FILE *file2=  fopen(filename, "w"); 
 	

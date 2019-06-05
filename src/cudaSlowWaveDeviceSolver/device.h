@@ -114,7 +114,7 @@ protected:
 	vector< string > iteratedNames;             //Имена параметров, которые надо перебрать
 	virtual void iterate(int) { throw ("iterate(int) is not implemented"); };                        //Перебор параметров, используется не во всех классах
 	virtual void changeParam(string, double);   //Изменить параметр по имени, используется там, где используется iterate();
-	double paramG();
+	virtual double paramG();
 	double power(double kpd);
 	double efficieny;
 	
@@ -158,22 +158,15 @@ protected:
 	double s_stat;
 	double monitor_par;
 
-	void setParamsFromXML(char *xmlfilename);
+//	void setParamsFromXML(char *xmlfilename);
 
 public:
-
 	Device ();
 	Device (QDomDocument* doc);
 	
-	double A0, B0;
-
+	double A0;
 	bool initSolver(int nz, double lsolver, double groupSpeedCoeff, char *_solvername);
-	
 	void releaseDeviceMemory();
-
-	void setCurrent(double current);
-
-
 };
 
 #endif

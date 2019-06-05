@@ -47,6 +47,10 @@ void lsolve(double *X, double *Y, double *dX) // Y dX = X
 
 
 }
+MultiplierMultiModes::MultiplierMultiModes():Multiplier()
+{
+	Namm = 1;					// оличиество учитываемых продольных мод (multimode oro)
+}
 
 MultiplierMultiModes::MultiplierMultiModes(QDomDocument * doc) :Multiplier(doc)
 {
@@ -92,7 +96,7 @@ double MultiplierMultiModes::getHFoutputPowerMultiModes(double _Current_ampers, 
 	if(k0 == k1)
 		findAstatMultiModes(nextX, N_it, G1, G2);
 	else
-	{	printf("\n Error: detuned mode is not yet written\n"); return 0;}
+	{	printf("\n Error: detuned mode is not yet implemented\n"); return 0;}
 
 	double NormaB = Norma1b*Lb/(2.*0.28);
 	double Gb = Current_ampers/17045.*1./(3.*k1*NormaB);

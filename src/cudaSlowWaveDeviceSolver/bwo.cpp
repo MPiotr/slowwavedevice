@@ -137,6 +137,7 @@ void BWO<TWTsolver>::solveBWO(double A0, double Delta0)
 
 	printf("calculating BWO:\n\t freq. = %g, wavenum. = %g deg., voltage = %g kV, current = %g A, reflection = %g,\n\tbeta_gr = %g,  G = %g\n\n", 299.8*k1 / (2.*Pi), synch_angle, voltage, Current_ampers, reflectionCoeff, group_speed, G);
 
+    if (longitudinalStructureRe) generateLongitudinalStructure(h);
 
 	double La = Nperiods*period*h;
 	double la = Nperiods*period*h;
@@ -144,11 +145,12 @@ void BWO<TWTsolver>::solveBWO(double A0, double Delta0)
 	int Nstop = ceil(La / dz);
 	if (Nstop > Nmax) Nstop = Nmax - 1;
 
-	if (longitudinalStructureRe) generateLongitudinalStructure(h);
+	
 
 	cplx F00, F01, F10, F11;
 	double J11, J12, J21, J22;
 	double iJ11, iJ12, iJ21, iJ22;
+	printf("reflection = %g\n", reflectionCoeff);
 	printf("%10s\t%10s\t%10s\t%10s\t%10s\n", "det", "delta", "a0", "real(F00)", "imag(F00)");
 	double eps = 1e-11;
 	double tol = 1e-10;

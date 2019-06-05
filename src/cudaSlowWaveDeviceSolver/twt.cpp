@@ -76,7 +76,7 @@ TWT::TWT(QDomDocument *doc) : Device(doc)
 
 	// ...................reading longitudinal structure.......
 	char logitudinalStructureFile[200];
-	if (setXMLEntry(doc, "logitudinalStructureFile", (char*)logitudinalStructureFile))
+	if (setXMLEntry(doc, "longitudinalStructureFile", (char*)logitudinalStructureFile))
 	{
 		if (_access(logitudinalStructureFile, 0) == 0)
 		{

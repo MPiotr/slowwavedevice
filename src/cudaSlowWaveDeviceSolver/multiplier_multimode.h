@@ -18,6 +18,7 @@ protected:
 
 public:
 	double getHFoutputPowerMultiModes(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double Norma2, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment);
+	MultiplierMultiModes();
 	MultiplierMultiModes(QDomDocument *doc);
 
 };

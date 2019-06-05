@@ -10,7 +10,7 @@ class Orotron : public Multiplier
 	virtual double ElectronsDeltaEnergy(double A);
 	virtual void iterate(int);
 public: 
-//	Orotron();
+	Orotron();
 	Orotron(QDomDocument *doc);
 	void solveOrotron();
 	double solveOrotron(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double _NormaB, double _voltage, double _inputPower_watts, double _delta, double _Qa, double _Qb, double _wall, char *filename, char *comment, double a00 = 0);

@@ -4,6 +4,7 @@
 #include "twt_1d.h"
 class TWT_0D : public TWT_1D
 {
+	bool initSolver(int nz, double lsolver);
 protected:
 	void changeParam(string, double);
 	void printCurrentParams(FILE * file);
@@ -25,8 +26,7 @@ protected:
 		double *fieldStructureRe, double *fieldStructureIm, double G,
 		double enPrint, bool printField = false,
 		double *longStrRe = NULL, double *longStrIm = NULL, double *qStr = NULL, double *mesh = NULL);
-	void readTransversalStructure();
-	bool initSolver(int nz, double lsolver);
+	void readTransversalStructure();	
 public:
 	TWT_0D(QDomDocument *doc);
 	TWT_0D(QDomDocument *doc, TWT_0D *instance);

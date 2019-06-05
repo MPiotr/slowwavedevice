@@ -84,11 +84,11 @@ void multiplier()
 	double spchQ1 = 6.83e-5;			//амплитуда пространственного заряда на НЧ; для 1d 3.46e-5; для 2d 2.2e-5
 	double spchQ3 = 6.83e-5;		  	   //амплитуда пространственного заряда на ВЧ;  для 1d 5e-5; для 2d  4.23e-5
 	char solverName[] = "multiplier_spcharge_2d";		//имя солвера "multiplier", "multiplier_spcharge", "multiplier_spcharge_2d"
-//	Multiplier_SpCharge_2D sol;  TODO закоментировал - нет пустого конструктора, поправить, позже
+	Multiplier_SpCharge_2D sol; 
 	char difrFlag[] = "Empiric"; //выбор зависимости дифр. добротности от длины: "Ohm","Min", "Empiric"
 	char comment[] = "До 615 в FindBStatDetunded вместо полной стояла\n омическая пересчёт для полной добротности равной половине омической\n Тоже, что в 631, ширина полосы больше плюс смещение по длине";
 
-//	sol.initMultiplierSolver(3000, 110, 0., solverName);
+	sol.initMultiplierSolver(3000, 110, 0., solverName);
 
 	int file_index = 5471;				//Индекс файла с результатами
 
@@ -117,7 +117,7 @@ void multiplier()
 		delta_freq = 0.253;
 //		delta_freq = 0.23 + (0.28-0.23)/15.*(double)u;// + 0.018/double(Ni)*i;;//0.195 + (0.245-0.195)/25.*(double)u;
 		
-	/*	double output_power = sol.getHFoutputPower( current,		 //Ток
+		double output_power = sol.getHFoutputPower( current,		 //Ток
 													period, Nper,	 //период, число периодов первой секции
 													ld, lb,			 //длина дрейфовой секции, длина второй секции
 													kw,				 //волновое число
@@ -131,7 +131,7 @@ void multiplier()
 													file2name,		 //имя файла для печати параметров
 													comment,			//коментарий в файл параметров
 													&inputPow, 
-													difrFlag);		 */
+													difrFlag);		 
 
 	/*	double output_power = sol.getHFoutputPowerDoubleScheme( current,		 //Ток
 													period, Nper,	 //период, число периодов первой секции
@@ -161,24 +161,24 @@ void multiplier()
 
 //		fprintf(file, "%g\t%g\t%g\n", delta_freq, output_power, inputPow);
 //		fprintf(file, "%g\t%g\t%g\n", lb, ld, output_power);
-// TODO		fprintf(file, "%g\t%g\t%g\t%g\t%g\n", lb, ld, delta_freq, output_power, inputPow);
+		fprintf(file, "%g\t%g\t%g\t%g\t%g\n", lb, ld, delta_freq, output_power, inputPow);
 		fflush(file);
 //		fprintf(file, "%g\t%i\t%g\t%g\t%g\n", voltage, Nper, ld2, lb, output_power);
 
 		sprintf(file1, "F:\\Piotr\\Multiplier_260GHz_Data\\currentData\\field1_%i_%i.txt", file_index, i);
 		sprintf(file2, "F:\\Piotr\\Multiplier_260GHz_Data\\currentData\\field3_%i_%i.txt", file_index, i);
-//TODO		sol.PrintCurrentsSpaceCharge2D(file1, file2);
+		sol.PrintCurrentsSpaceCharge2D(file1, file2);
 
 	}
 	fclose(file);
 
 
 
-//TODO	sol.releaseMultiplierMemory();
+	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
 }
-/* TODO default contstuctor
+
 void orotron()
 {
 
@@ -191,7 +191,7 @@ void orotron()
 
 	Orotron sol; 
 
-	sol.initMultiplierSolver(1000, 40, 0., "orotron");
+	sol.initSolver(1000, 40, 0., "orotron");
 
 
 //	_mkdir("D:\\Piotr\\Multiplier_260GHz_Data");
@@ -283,10 +283,10 @@ void orotron()
 
 
 
-	sol.releaseMultiplierMemory();
+	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
-}*/
+}
 void twt()
 {
 	_chdir("F:\\Piotr\\CalcData\\twt_data");
@@ -394,7 +394,9 @@ int startXML(int argc, char *argv[])
 	else
 	{		
 		QString err_msg; int err_line; int err_column;
-		if (argc > 2 && strcmp(argv[1], "-i") == 0)
+		if (
+			argc > 2 && strcmp(argv[1], "-i") == 0
+			)
 		{
 			try   { 
 				_chdir(argv[2]); 
@@ -410,7 +412,7 @@ int startXML(int argc, char *argv[])
 		QFile file("input.xml");
 		if (!file.open(QIODevice::ReadOnly))
 		{
-			printf("\nError reading input file\n");
+			printf("\nError reading input file\n");	
 			return 3;
 		}
 		bool set_cont = doc.setContent(&file, &err_msg, &err_line, &err_column);
@@ -452,7 +454,7 @@ int startXML(int argc, char *argv[])
 		}
 		else
 		{
-			printf("solver name is not recognized\n");
+			printf("solver name \"%s\" is not recognized\n", problemType);
 		}
 
 		solverfound = true;
@@ -476,7 +478,7 @@ int startXML(int argc, char *argv[])
 		}
 		else
 		{
-			printf("solver name is not recognized\n");
+			printf("solver name is \"%s\"  not recognized\n", problemType);
 		}
 		solverfound = true;
 	}
@@ -683,29 +685,26 @@ void orotron_XML()
 	cudaDeviceReset();
 	
 }
-/*void multimode_orotron() TODO: solve problem with default constuctor
+void multimode_orotron()
 {
 
 	char rootFolder[600], filename[300], file2name[300], file3name[100];
 	_mkdir("MultiplierTest"); _chdir("MultiplierTest");
 	_mkdir("Data1"); _chdir("Data1"); _getcwd(rootFolder, 600);
 
-	Orotron sol;
+	OrotronMutlimode sol;
 
-	sol.initMultiplierSolver(1000, 40, 0., "orotron");
-
+	sol.initSolver(1000, 40, 0., "orotron");
 
 //	_mkdir("D:\\Piotr\\Multiplier_260GHz_Data");
 
-
-
 // Параметры (ВСЕ)
-	double current = 0.01;				//Ток
-	double period = 3.1; int Nper = 10.;	//период, число периодов первой сек (если вывод излучения адиабатический, то можно немного добавить длины, так как синус немного "выползает"
+	double current = 0.01;				  //Ток
+	double period = 3.1; int Nper = 10.;	 //период, число периодов первой сек (если вывод излучения адиабатический, то можно немного добавить длины, так как синус немного "выползает"
     double ld = 15., lb = 15.;				//длина дрейфовой секции, длина второй секции
-	double kw = 2.*Pi*35.2/299.8;		//волновое число (частота возбуждения)
-	double norm1 = 143.3;					//для прямоугольной гофрировки wall = 0.1: Norm = ; wall = 0.07 Norm = ?
-										//для синусовой гофрировки wall = 0.05: Norm = 33.8; wall = 0.07 Norm = 42;
+	double kw = 2.*Pi*35.2/299.8;		   //волновое число (частота возбуждения)
+	double norm1 = 143.3;				  //для прямоугольной гофрировки wall = 0.1: Norm = ; wall = 0.07 Norm = ?
+										 //для синусовой гофрировки wall = 0.05: Norm = 33.8; wall = 0.07 Norm = 42;
 	double norm1B= 13.6380622;			//
 	double p_in = 0., delta_freq =  0.; //входная мощность, и сдвиг частоты
 	double voltage = 200.;				//напряжение
@@ -716,17 +715,10 @@ void orotron_XML()
 	double initAmpMax = 1e-6;			//Максимум амплитуды в начальный момент
 	char comment[] = "Первый прогон";
 
-
-
-	
-
 //	devID = findCudaDevice(argc, (const char **)argv);
 //  cudaGetDeviceProperties(&deviceProp, devID);
 
-
 	int file_index = 1;				//Индекс файла с результатами
-
-
 
 	sprintf(file3name,"P_vs_current_U_Ld");
 	sprintf(filename,  "F:\\Piotr\\CalcData\\mm_orotron_Data\\%s_%i.txt", file3name, file_index);
@@ -745,7 +737,6 @@ void orotron_XML()
 	printf("Qa = %g\n", Qa);
 
 	Qa = 900;
-
 
 //	for(voltage = 15.6; voltage <= 16.; voltage += 0.2)
 //	for(int Nper = 11; Nper < 21; Nper+=2)
@@ -788,10 +779,10 @@ void orotron_XML()
 
 
 
-	sol.releaseMultiplierMemory();
+	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
-}*/
+}
 void multimode_orotronXML(char *inputfilename)
 {
 
@@ -909,16 +900,13 @@ void multimode_orotronXML(char *inputfilename)
 	QDomText t = doc.createTextNode(QString(filename));
 	outputFile1.appendChild(t);
 	
-	docElem.appendChild(outputFile1);
-	
-	
+	docElem.appendChild(outputFile1);	
 
 	sprintf(file2name, "F:\\Piotr\\CalcData\\mm_orotron_Data\\%s_params_%i.xml", file3name, file_index);
 	FILE *xmlFile = fopen(file2name, "w");
 	fprintf(xmlFile, "%s", qPrintable(doc.toString()));
 	fclose(xmlFile);
 	sprintf(file2name, "F:\\Piotr\\CalcData\\mm_orotron_Data\\%s_params_%i.txt", file3name, file_index);
-
 
 	int Nj = 1, Ni = 1;
 
@@ -930,7 +918,6 @@ void multimode_orotronXML(char *inputfilename)
 	printf("Qa = %g\n", Qa);
 
 	Qa = 900;
-
 
 //	for(voltage = 15.6; voltage <= 16.; voltage += 0.2)
 //	for(int Nper = 11; Nper < 21; Nper+=2)
@@ -971,156 +958,10 @@ void multimode_orotronXML(char *inputfilename)
 	}
 //	fclose(file);
 
-
-
 	sol.releaseDeviceMemory();
 	cudaDeviceReset();
 	
 }
-/*void Klinotron1()
-{
-	double K = 1;
-
-	char rootFolder[600], currentFolder[600], alphaFolder[600], filename[300];
-	_mkdir("CudaTest"); _chdir("CudaTest");
-	_mkdir("Data5"); _chdir("Data5"); _getcwd(rootFolder, 600);
-
-	
-	Wave wave(2*Pi,0,K, 1, 1, 0, 0, 0, 0);
-	Beam beam(Beam::VtoU(C*K/wave.geth()), 0.3,  0.0001, 1,     0.3,  1.6*wave.geth());
-	         //   U                       //I    //X0   //Xmax   //w     //h l
-	beam.alpha = 1./6.;//0.4;
-	CData data(6, 100, 0.06*0.5, 12000,   32,  32 , beam);
-			 //L          //Nz   //d    //Nt  //Nq //Nx 
-	Klinotron sol(data, beam, wave);
-//	sol.changeAlphaChangingHeight(0.4);
-//	sol.execute();
-
-	
-	double L, L0, DL, alpha, alpha0, Dalpha; int NL, Nalpha;
-	L0 = 7;	    alpha0 = 0.1;
-	DL = 10;	Dalpha = 0.2;
-	NL = 7;	  Nalpha = 7;
-
-		
-	double *X = new double [NL]; 
-	double *Y1 = new double [NL]; double *Y2 = new double [NL]; double *Y3 = new double [NL];
-
-
-	for(int j = 0; j < Nalpha; j++)
-	{
-		alpha = alpha0  + Dalpha/(double)Nalpha*(double)j;
-		sprintf(currentFolder, "alpa-%g", alpha); _mkdir(currentFolder); _chdir(currentFolder); _getcwd(alphaFolder, 600);
-
-		for(int i = 0; i < NL; i++)
-		{
-			L = L0 + DL/(double)NL*(double)i;
-			sprintf(currentFolder, "Data-%g-%g", alpha, L); _mkdir(currentFolder); _chdir(currentFolder);
-
-			sol.changeL(L);
-			sol.changeAlphaChangingHeight(alpha);
-			time_t startTime, finishTime; 
-			time(&startTime);
-			sol.execute();
-		//	sol.StartCurrentEvaluation();
-			time(&finishTime); printf("\nElapsed time is %g\n",difftime(finishTime, startTime));
-
-			X[i] = L;
-			Y1[i] = sol.getKPD();
-			Y2[i] = sol.getKPDav();
-
-			_chdir(alphaFolder);
-		}
-		_chdir(rootFolder);
-		sprintf(filename, "kpd_vs_L_a%g.txt", alpha);
-		PrintTableX(filename, Y1, X, NL);
-		sprintf(filename, "kpdAV_vs_L_a%g.txt", alpha);
-		PrintTableX(filename, Y2, X, NL);
-	}
-
-}
-void MPI_Klinotron(int  argc,  char **argv)
-{
-	double K = 1;
-
-	char rootFolder[600], currentFolder[600], alphaFolder[600], filename[300];
-	_mkdir("ModData3"); _chdir("ModData3");
-	_mkdir("Data2"); _chdir("Data2"); _getcwd(rootFolder, 600);
-
-	
-	Wave wave(2*Pi,0,K, 1, 1, 0, 0, 0, 0);
-	Beam beam(Beam::VtoU(C*K/wave.geth()), 0.3,  0.0001, 1,     0.3,  1.6*wave.geth());
-	         //   U                       //I    //X0   //Xmax   //w     //h l
-	beam.alpha = 1./6.;//0.4;
-	CData data(6, 100, 0.06*0.5, 8000,   33,  33 , beam);
-			 //L          //Nz   //dt    //Nt  //Nq //Nx 
-	
-
-
-	
-	double L, L0, DL, alpha, alpha0, Dalpha; int NL, Nalpha;
-	L0 = 10;     alpha0 = 0.25;
-	DL = 30; 	 Dalpha = 0.1;
-	NL = 18; 	 Nalpha = 1;
-
-		
-	double *X = new double [NL]; 
-	double *Y1 = new double [NL]; double *Y2 = new double [NL]; double *Y3 = new double [NL];
-
-	int rank, size;  double buff[3], buff2[20];
-/*
-	MPI_Init(&argc, &argv);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-
-
-	Klinotron sol(data, beam, wave);
-
-
-	for(int j = 0; j < Nalpha; j++)
-	{
-		alpha = alpha0  + Dalpha/(double)Nalpha*(double)j;
-		sprintf(currentFolder, "alpa-%g", alpha); _mkdir(currentFolder); _chdir(currentFolder); _getcwd(alphaFolder, 600);
-		printf("size = %i\n", size);
-
-		for(int i = 0; i < NL/size; i++)
-		{
-			L = L0 + DL/(double)NL*(double)(i*size+rank);
-			sprintf(currentFolder, "Data-%g-%g", alpha, L); _mkdir(currentFolder); _chdir(currentFolder);
-
-			sol.changeL(L);
-			sol.changeAlphaChangingHeight(alpha);
-			sol.changeNx((int) (L*alpha)*5);
-			sol.execute();
-
-			buff[0] = L;
-			buff[1] = sol.getKPD();
-			buff[2] = sol.getKPDav();
-
-			_chdir(alphaFolder);
-			MPI_Gather(buff, 3, MPI_DOUBLE, buff2, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-			if(rank == 0)
-			{
-			
-				for(int r = 0; r < size; r++) {X[(size)*i+r] = buff2[3*r+0]; Y1[(size)*i+r] = buff2[3*r+1]; Y2[(size)*i+r] = buff2[3*r+2];}
-			}
-
-		}
-
-		if(rank == 0)
-		{	_chdir(rootFolder);
-			sprintf(filename, "kpd_vs_L_a%g.txt", alpha);
-			PrintTableX(filename, Y1, X, NL);
-			sprintf(filename, "kpdAV_vs_L_a%g.txt", alpha);
-			PrintTableX(filename, Y2, X, NL);
-		}
-	}
-	printf("\n rank %i finalized\n", rank);
-	fflush(0);
-	MPI_Finalize();
-}*/
 int main(int argc, char *argv[])
 {
 	int devNum = -1;

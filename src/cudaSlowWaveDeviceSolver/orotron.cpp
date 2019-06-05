@@ -1,9 +1,9 @@
 #include "orotron.h"
 
-/*Orotron::Orotron() :Multiplier()
+Orotron::Orotron() : Multiplier()
 {
 	;
-}*/
+}
 Orotron::Orotron(QDomDocument *doc) : Multiplier(doc)
 {
 	;

@@ -2,6 +2,14 @@
 #include "xml_routines.h"
 
 
+Multiplier::Multiplier() : Device()
+{
+	B_stat = 0.;
+	Lb = 0;
+	Qb = 0;
+	Ld = 1;
+
+}
 
 Multiplier::Multiplier(QDomDocument *doc) : Device(doc)
 {
@@ -13,11 +21,11 @@ Multiplier::Multiplier(QDomDocument *doc) : Device(doc)
 	else {
 		double norm1B;
 		setXMLEntry(&HFsection, "periodNorma", &norm1B);
-		setXMLEntry(&HFsection, "length", &Lb);  //длина длина второй секции
-		setXMLEntry(&HFsection, "QFactor", &Qb); // добротности второй (омическая) секции
+		setXMLEntry(&HFsection, "length", &Lb);				  	 //длина длина второй секции
+		setXMLEntry(&HFsection, "QFactor", &Qb);				// добротности второй (омическая) секции
 
 	}
-	setXMLEntry(doc, "Dreif", &Ld);									//длина дрейфовой секции, длина второй секции
+	setXMLEntry(doc, "Dreif", &Ld);								//длина дрейфовой секции, длина второй секции
 
 }
 
@@ -177,7 +185,7 @@ double Multiplier::getHFoutputPower(double _Current_ampers, double _period, int 
 	printf("HF output power  = %g\t Residual = %g\n", outputPower, abs(b[Nb_it - 1]) - abs(b[Nb_it - 2]));
 
 
-	*monitor = A_stat;//imag(B_stat);//A_stat;//abs(B_stat)*abs(B_stat)/(2.*Qfull*Gb);//monitor_par;//;
+	*monitor = A_stat;
 
 	return outputPower;
 }
@@ -411,8 +419,6 @@ double Multiplier::findAstatDetuned(double nextA, int N_it, double G, double Sin
 		//		printf("A_{st}= %g\tdet = %g\t%g\t%g\n", abs(A00), det, abs(A00 - temp), abs(CurrentA(real(A00), imag(A00))));
 
 		A00 = temp;
-
-
 
 	}
 	printf("A_{stat}  = %g\t Residual = %g\n", abs(A00), abs(A10 - A00));

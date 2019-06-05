@@ -1,7 +1,7 @@
 #ifndef __MULTIPLIER_THREE_CAVITY_H
 #define __MULTIPLIER_THREE_CAVITY_H
 #include "multiplier.h"
-class MultiplierTreeCavity : public Multiplier {
+class MultiplierThreeCavity : public Multiplier {
 protected:
 	double Lb;							    //длина ВЧ секции (третьей)
 	double Qb;								//Омическая добротность ВЧ секции
@@ -20,7 +20,7 @@ protected:
 
 	double DeltaEnergyDoubleScheme();
 public:
-	MultiplierTreeCavity(QDomDocument* doc);
+	MultiplierThreeCavity(QDomDocument* doc);
 	double getHFoutputPowerDoubleScheme(double _Current_ampers, double _period, int _Nperiods, double _Ld1, double _Ld2, double _La2, double _Lb, double _k1, double _Norma, double Norma1B, double _voltage, double _inputPower_watts, double _delta, double _Qa1, double _Qa2, double _Qb, double _wall, char *filename, char *comment);
 	double retriveBPower(cplx b, double omega, double Qb, double NormaB);
 };

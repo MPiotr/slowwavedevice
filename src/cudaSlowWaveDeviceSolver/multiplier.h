@@ -5,6 +5,8 @@
 class Multiplier : public Device
 {
 protected:
+	double B0; //
+
 	cplx  B_stat;
 	double Ld, Lb;							//длина дрейфовой секции, длина второй (ВЧ) секции
 	double Norma1b;							//норма вч секции (один период)
@@ -16,7 +18,7 @@ protected:
 
 	double diffractionQ(char *);				//Задаёт значение дифракционной добротности (проверяет соответствующий флаг)
 
-	double ElectronsDeltaEnergy(double _A); // обёртка для изменения средней энергии электронов
+	virtual double ElectronsDeltaEnergy(double _A); // обёртка для изменения средней энергии электронов
 	double DeltaEnergy(double _A);
 
 	virtual cplx ElectronCurrentA(double reA, double imA);          //обёртка для ВЧ тока на первой гармонике
@@ -38,6 +40,7 @@ protected:
 	void retriveBCurr(cplx* J1, cplx* J2);						//Для решателя с двумя продольными гармониками, 
 	double retriveDeltaEnergy();
 public:
+	Multiplier();
 	Multiplier(QDomDocument* doc);
 
 	double getHFoutputPower(double _Current_ampers, double _period, int _Nperiods, double _Ld, double _Lb, double _k1, double _Norma, double _NormaB, double _voltage, double _inputPower_watts, double _delta, double _Qa, double _Qb, double _wall, double _sQ1, double _sQ3, char *filename, char *comment, double *monitor = 0, char *difrFlag = 0);
