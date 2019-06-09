@@ -1,5 +1,6 @@
 #include <qfiledialog.h>
 #include "slowwavedevice.h"
+#include "customxmldelegate.h"
 
 
 slowwavedevice::slowwavedevice(QWidget *parent)
@@ -36,6 +37,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 
 
 	ui.treeView->setModel(projmodel);
+	ui.treeView->setItemDelegate(new customxmldelegate (projmodel, (projmodel->toolTipsXML)));
 	ui.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui.menuBar->show();
 	ui.textBrowser->setFontFamily("Consolas");
@@ -287,10 +289,11 @@ void slowwavedevice::openFileFun(QString inputFile)
 	setWindowTitle("Slow-wave device solver: " + inputFile);
 	projmodel->setprojContent(&input);
 	ui.treeView->expandAll();
-	projmodel->setDispersionsPlot(qplot, 50);
+	projmodel->setDispersionsPlot(qplot, ui.textBrowser, 50);
 	projmodel->setPlot(couplingPlot, "logitudinalStructureFile", 50, ui.textBrowser);
 	qplot->replot();
 	input.close();
+
 	if (!recentFiles.contains(inputFile))
 	{
 		recentFiles.push_front(inputFile);
@@ -301,6 +304,7 @@ void slowwavedevice::openFileFun(QString inputFile)
 		recentFiles.removeOne(inputFile);
 		recentFiles.push_front(inputFile);
 	}
+	updateRecentFilesActions();
 
 	ui.textBrowser->append("<div align = \"left\"> open " + inputFile + "</div><div align = \"center\"><b>" + projmodel->problemName + "</b></div><div><div align = \"left\"></div>");
 	enableButtons();

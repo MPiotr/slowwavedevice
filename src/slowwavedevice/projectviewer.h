@@ -22,10 +22,13 @@ public:
 	QDomDocument getDoc();
 	QString getXMLString();
 	QString problemName;
-	void setDispersionsPlot(QCustomPlot *plot, int Npoints);
+	void setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints);
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
 	double period;	
 	QTextBrowser *debugBrowser;
+	QDomDocument *toolTipsXML;
+
+	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);
 public slots:
 	void itemChanged(QModelIndex);
 	void itemClicked(QModelIndex);
@@ -35,6 +38,8 @@ signals:
 	void errorOpeningFile(QString line, int row, int column);
 	void voltageChanged(QString newvalue);
 	void setVisiblePlot(int plotNum);
+
+	
 
 private:
 	QDomDocument doc; 

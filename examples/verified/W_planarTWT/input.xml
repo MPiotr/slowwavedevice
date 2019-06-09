@@ -1,0 +1,45 @@
+<xml encoding="ISO-8859-1" version="1.0">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName>folded waveguide -  TWT test</problemName>
+  <beam>
+   <voltage>9</voltage>
+   <current iterable="0">0.17</current>
+   <height>0.176</height>
+   <beamStructureGap unit="mm">1e-8</beamStructureGap>
+   <beamWidth>0.1</beamWidth>
+   <beamHeight>0.1</beamHeight>
+   <angle>400</angle>
+  </beam>
+  <wave>
+   <frequency>100</frequency>
+   <power>0.1</power>
+  </wave>
+  <cavity>
+   <LFsection>
+    <period unit="mm">0.7</period>
+    <periodNumbers iterable="0">26</periodNumbers>
+    <width>100</width>
+    <periodNorma>8</periodNorma>
+    <QFactor>1000</QFactor>
+    <structureWidth unit="mm">1.78</structureWidth>
+    <groupSpeed>-0.2338</groupSpeed>
+    <!--group speed is negative: BWO! -->
+    <fieldFileName>test1.csv</fieldFileName>
+    <dispersionFileName>dispersion.csv</dispersionFileName>
+    <logitudinalStructureFile type="filename">coupling.csv</logitudinalStructureFile>
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time>75</Time>
+   <MaxPointNumber>450</MaxPointNumber>
+   <MaxLength>350</MaxLength>
+   <solverName>twt</solverName>
+   <problemType>twt</problemType>
+   <comment>twt_fw</comment>
+   <fileIndex>1</fileIndex>
+   <initialAmp>1.58e-5</initialAmp>
+   <initialDelta>-0.027</initialDelta>
+  </solver>
+  <workingDirectory>F:/Piotr/CalcData/verifiedCpy/W_planarTWT</workingDirectory>
+ </xs:schema>
+</xml>

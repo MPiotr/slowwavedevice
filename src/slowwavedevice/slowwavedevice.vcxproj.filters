@@ -83,6 +83,15 @@
     <ClCompile Include="resultreadyevent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_customxmldelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_customxmldelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="customxmldelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="slowwavedevice.h">
@@ -112,6 +121,9 @@
     <CustomBuild Include="aboutDialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="customxmldelegate.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_slowwavedevice.h">
@@ -126,5 +138,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="slowwavedevice.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="helpInfo.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

@@ -1,0 +1,40 @@
+<xml encoding="ISO-8859-1" version="1.0">
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <problemName>axi-symmetric BWO ver 2</problemName>
+  <beam>
+   <voltage>11</voltage>
+   <current>1</current>
+   <height>0.1</height>
+   <beamStructureGap unit="mm">0.1</beamStructureGap>
+   <beamWidth unit="mm">1.76</beamWidth>
+   <beamHeight unit="mm">0.176</beamHeight>
+   <angle>400</angle>
+  </beam>
+  <wave>
+   <frequency>44.4</frequency>
+   <power>0.1</power>
+  </wave>
+  <cavity>
+   <LFsection>
+    <period>1.6</period>
+    <periodNumbers>21</periodNumbers>
+    <periodNorma>9.7</periodNorma>
+    <QFactor>1100</QFactor>
+    <boundaryReflection>0.05</boundaryReflection>
+    <boundaryReflectionPhase>0</boundaryReflectionPhase>
+    <structureWidth unit="mm">1.78</structureWidth>
+    <dispersionFileName>dispersion.csv</dispersionFileName>
+   </LFsection>
+  </cavity>
+  <solver>
+   <Time>75</Time>
+   <MaxPointNumber>450</MaxPointNumber>
+   <MaxLength>100</MaxLength>
+   <solverName>twt1d</solverName>
+   <problemType>twt1d</problemType>
+   <comment>twt_fw</comment>
+   <fileIndex>3</fileIndex>
+  </solver>
+  <workingDirectory>F:/Piotr/CalcData/verifiedCpy/Ka_twt_axial_1</workingDirectory>
+ </xs:schema>
+</xml>

@@ -25,6 +25,20 @@ projectviewer::~projectviewer()
 
 }
 
+bool    projectviewer::openHelperXML(QDomDocument* helper, QString *err_msg,  int *err_line, int *err_column){
+	QFile input("helpInfo.xml");
+	if (!input.open(QIODevice::ReadOnly)){
+		*err_msg = "File helpInfo.xml is not available";
+		*err_line = 0;
+		*err_column = 0;
+		return false;
+	}
+
+	bool readhelp = helper->setContent(&input, err_msg, err_line, err_column);
+	input.close();
+	return readhelp;
+}
+
 void projectviewer::setprojContent(QFile* input)
 {
 	QString err_msg; int err_line; int err_column;
@@ -56,9 +70,10 @@ void projectviewer::setprojContent(QFile* input)
 // ----------
 
 }
-void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1)
+void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1) //Adds only one node without recuresion. Used for toggling iterate
 {
 	QString elementName = node->nodeName();
+	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
 
 	StandardXMLItem *  thisItemName = new StandardXMLItem(elementName, *node);
 	thisItemName->setEditable(false);
@@ -106,10 +121,15 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 	QString elementValue = node->toElement().text();
 	StandardXMLItem *  thisItemValue = new StandardXMLItem(elementValue);
 	thisItemValue->setEditable(true);
+
 	
 	if (elementName != QString("#comment"))
 	{
+<<<<<<< HEAD
 		QDomNodeList tooltips = toolTipsXML.elementsByTagName(thisItemName->nodeName);
+=======
+		QDomNodeList tooltips = toolTipsXML->elementsByTagName(thisItemName->nodeName);
+>>>>>>> refs/heads/IAP_local
 		if (!tooltips.isEmpty())
 		{
 			QString  nodevalue = tooltips.item(0).toElement().firstChild().nodeValue();
@@ -172,14 +192,20 @@ void projectviewer::showContextMenu(QTreeView *view, QModelIndex index, QPoint p
 {
 	
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(index);
-	QDomElement current = currentItem->node.toElement();
+	QString elementName = currentItem->nodeName;
+	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
+
+	QDomElement current = helperNode.toElement(); //  currentItem->node.toElement();
 	QString iterable = current.attribute("iterable");
+
+	QDomNode itemNode = currentItem->node;
+	QString iterableItem = itemNode.toElement().attribute("iterable");
 
 	if (iterable == "0" || iterable == "1")
 	{
 		QMenu contextMenu(view);
 		QString text;
-		if (iterable == "0") text = "iterate value";
+		if (iterableItem == "0") text = "iterate value";
 		else text = "single value";
 		projviewMenuAction	action(text, &index, &contextMenu);
 		contextMenu.addAction(&action);
@@ -225,13 +251,17 @@ QString projectviewer::getXMLString()
 	return doc.toString();
 }
 
-void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
+void projectviewer::setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints)
 {
-	char dispersionFileName[200];
+	char dispersionFileName[200] = "";
 	double norm1;
 	QDomNode LFsection = doc.elementsByTagName("LFsection").item(0);
-	if (LFsection.isNull()){ printf("Error: LFsection entry is not found\n"); return; }
-	if (!setXMLEntry(&LFsection, "period", &period)) { printf("Error: LF period is not found\n"); return; }
+	if (LFsection.isNull()){
+		console->append("<b><font color=\"red\">Error: LFsection entry is not found</font></b>"); return;
+	}
+	if (!setXMLEntry(&LFsection, "period", &period)) {
+		console->append("<b><font color=\"red\">Error: LF period is not found</font></b>");  return;
+	}
 	
 	Synchronism *syncwave;
 	Interpolation *interpolation;
@@ -241,10 +271,11 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 	setXMLEntry(&doc, "frequency", &fre, &iteratedParams, &iteratedNames);	k1 = fre*2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 1);
 	QVector<double> y(Npoints + 1);
-	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName))
+	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).exists())
 	{
 		syncwave = new Synchronism(dispersionFileName, period, 299.8*k1 / (2.*M_PI));
 		interpolation = new Interpolation(dispersionFileName);
+
 		for (int i = 0; i <= Npoints; i++)
 		{
 			x[i] = 720 / (double)Npoints * i;
@@ -259,9 +290,10 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, int Npoints)
 	}
 	else
 	{
+		if (!setXMLEntry(&doc, "dispersionFileName", dispersionFileName)) console->append("<b><font color=\"red\">Error</font></b> reading file <b>"+QString(dispersionFileName)+"</b>");
 		plot->addGraph();
 		plot->graph(0)->data()->insert(0, QCPData(0, fre));
-		plot->graph(0)->data()->insert(720, QCPData(720, fre));
+		plot->graph(0)->data()->insert(720, QCPData(720, fre)); 
 	}
 
 	double voltage;
@@ -321,13 +353,18 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 	Interpolation *interpolation;
 
 	double k1;
-
+	 
 	setXMLEntry(&doc, "frequency", &k1, &iteratedParams, &iteratedNames);	k1 *= 2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 2);
 	QVector<double> y(Npoints + 2);
 	if (setXMLEntry(&doc, entryName, fileName))
 	{
+		if (!QFile(QString(fileName)).exists()) {
+			browser->append("<b><font color = \"red\">Error</font></b> reading file <b>" + QString(fileName) + "</b>"); 
+			return;
+		}
 		interpolation = new Interpolation(fileName);
+	
 		
 		double max = interpolation->xMax();
 		double min = interpolation->xMin();
@@ -363,7 +400,7 @@ void projectviewer::toggleIterate(QModelIndex* index)
 		QDomNode  parent = node.parentNode();
 		QString name = node.nodeName();
 
-		if (iterable == "0")
+		if (iterable == "0" || iterable == NULL)
 		{
 			QString fromText = current.text();
 			QDomNode newFrom = doc.createElement("from");

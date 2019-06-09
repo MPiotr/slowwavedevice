@@ -4,13 +4,17 @@ load "Element_P3"
 	mesh Th;
 	real R1, R2, Rmin, amp, high, low, d = 1., Ltr, ymin, ymax, h;
     bool ifPlot;
-	ofstream file("Ez.csv");
-	ofstream frefile("dispersion.csv");
-    ofstream lfieldfile("lfield_2.csv");
-    ofstream fieldfile("transField.csv");
-    ofstream filefre ("_original.csv");
+    R1 =5.;// 1.45;
+    R2 =5.4;// 0.9;
 
- 
+	ofstream file("Ez.csv");
+	ofstream frefile("F:\\Piotr\\CalcData\\twt_data\\W_bwo_FoldWg_4\\.disp1.csv");
+    ofstream lfieldfile("lfield_2.csv");
+    ofstream fieldfile("F:\\Piotr\\CalcData\\twt_data\\W_bwo_FoldWg_4\\test1.csv");
+    ofstream filefre ("_original_chin.csv");
+
+  // if(R2  == R1) continue; //1.108; 1.121
+
 for(int j = 0; j <= 0; j++)
 {
      R1 = 0.28*0.5;
@@ -19,7 +23,8 @@ for(int j = 0; j <= 0; j++)
 	 real tthwide = 0.175;
 	 real grvwide = d - tthwide;
      real beamheight = 0.176;
-       h =  (300)/180.*pi/d;
+  //   h =  (92.)/180.*pi/d + 2.*pi/d*j/60.;//2.*pi - 2.*pi/d*j/250.;
+     h =  (300)/180.*pi/d;//(420-360)/180.*pi/d + 2.*pi/d*j/60.;//2.*pi - 2.*pi/d*j/250.;
 	 Ltr = 1.78;
      ifPlot = false;
 
@@ -30,7 +35,10 @@ for(int j = 0; j <= 0; j++)
 	 int harmNum = 1;
     
 
-  cout<<R1<<"________"<<R2<<"\n";		
+  // if(R2  == R1) continue; //1.108; 1.121
+
+
+   cout<<R1<<"________"<<R2<<"\n";		
 
    
    border G11(t = 0, 0.5*grvwide)  		   		   {x = t;     			 y = R2;    label = 1;}
@@ -168,14 +176,19 @@ plot(eVphi[1],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = "Ephi; f = " + 
 		    A1 /= N+1.;  A0/= N+1;
 			if(y == 0) A1zero = A1;
             cout<<y<<"......."<<A1<<"..."<<abs(A1)<<"\n";
+//		    fieldfile<<y<<","<<real(eVz[Zzz])<<","<<imag(eVz[Zzz])<<"\n";
 		    fieldfile<<y<<","<<real(A1)/sqrt((Ltr*vol/(2*4.*pi)))<<","<<imag(A1)/sqrt((Ltr*vol/(2*4.*pi)))<<"\n";
 
 		}
 
      for(int ix = 0; ix < 200; ix++)
 	 {
+//			y = -R1 + (R2+R1)/200.*ix;
+//    		x = 0;
 			y = 0;
 			x = ix/200.*d;
+//			lfieldfile<<y<<","<<real(eVz[Zzz]*exp(1i*h*x))<<","<<imag(eVz[Zzz]*exp(1i*h*x))<<"\n";
+//			lfieldfile<<x<<","<<real((dy(eVz[0]))*exp(1i*h*x))<<","<<imag((dy(eVz[0]))*exp(1i*h*x))<<"\n";
 			lfieldfile<<x<<","<<real(eVz[0]*exp(1i*h*x))<<","<<imag(eVz[0]*exp(1i*h*x))<<"\n";
 	 }
 

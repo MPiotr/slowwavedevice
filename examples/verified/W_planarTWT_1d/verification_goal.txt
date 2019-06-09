@@ -1,0 +1,2 @@
+Testing consistens of 2d and 1d TWT solvers:
+Result must be close to results of ../W_planarTWT
