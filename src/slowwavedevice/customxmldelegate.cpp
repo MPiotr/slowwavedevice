@@ -1,7 +1,5 @@
-#include "qstandarditemmodel.h"
 #include "customxmldelegate.h"
 #include "standartxmlitem.h"
-#include "qstandarditemmodel.h"
 
 
 

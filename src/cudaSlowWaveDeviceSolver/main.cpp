@@ -12,7 +12,7 @@
 #include "multiplier_spcharge_2d.h"
 #include "Interpolation.h"
 #include "synchronism.h"
-#include<mpi.h>
+//#include<mpi.h>
 #include<fftw3.h>
 #include<direct.h>
 #include<time.h>

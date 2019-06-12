@@ -73,7 +73,7 @@ void projectviewer::setprojContent(QFile* input)
 void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1) //Adds only one node without recuresion. Used for toggling iterate
 {
 	QString elementName = node->nodeName();
-	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
+	QDomNode helperNode = toolTipsXML.elementsByTagName(elementName).at(0);
 
 	StandardXMLItem *  thisItemName = new StandardXMLItem(elementName, *node);
 	thisItemName->setEditable(false);
@@ -125,11 +125,9 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 	
 	if (elementName != QString("#comment"))
 	{
-<<<<<<< HEAD
+
 		QDomNodeList tooltips = toolTipsXML.elementsByTagName(thisItemName->nodeName);
-=======
-		QDomNodeList tooltips = toolTipsXML->elementsByTagName(thisItemName->nodeName);
->>>>>>> refs/heads/IAP_local
+
 		if (!tooltips.isEmpty())
 		{
 			QString  nodevalue = tooltips.item(0).toElement().firstChild().nodeValue();
@@ -193,7 +191,7 @@ void projectviewer::showContextMenu(QTreeView *view, QModelIndex index, QPoint p
 	
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(index);
 	QString elementName = currentItem->nodeName;
-	QDomNode helperNode = toolTipsXML->elementsByTagName(elementName).at(0);
+	QDomNode helperNode = toolTipsXML.elementsByTagName(elementName).at(0);
 
 	QDomElement current = helperNode.toElement(); //  currentItem->node.toElement();
 	QString iterable = current.attribute("iterable");

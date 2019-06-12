@@ -5,12 +5,9 @@
 #include <QAbstractItemModel>
 #include <qsharedmemory.h>
 #include "qcustomplot.h"
-//#include <mgl2/qmathgl.h>
-//#include <mgl2/mgl.h>
 #include <qprocess.h>
 #include <qbuffer.h>
 #include "projectviewer.h"
-//#include "mglPlot.h"
 
 #include "ui_slowwavedevice.h"
 #include "ui_aboutDialog.h"

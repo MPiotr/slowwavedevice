@@ -37,7 +37,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 
 
 	ui.treeView->setModel(projmodel);
-	ui.treeView->setItemDelegate(new customxmldelegate (projmodel, (projmodel->toolTipsXML)));
+	ui.treeView->setItemDelegate(new customxmldelegate (projmodel, &(projmodel->toolTipsXML)));
 	ui.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui.menuBar->show();
 	ui.textBrowser->setFontFamily("Consolas");
