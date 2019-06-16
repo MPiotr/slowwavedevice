@@ -22,6 +22,16 @@ public:
 	double xMin();
 	double xMax();
 
+	void reload(char * filename) { 
+		y.clear(); 
+		load(filename); 
+	}
+
+	void reload(double *_x, double *_y, int n) {
+		y.clear();
+		load(_x, _y, n);
+	}
+
 	void unitTesting();
 };
 typedef Interpolation* func;

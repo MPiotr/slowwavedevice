@@ -39,9 +39,10 @@ bool    projectviewer::openHelperXML(QDomDocument* helper, QString *err_msg,  in
 	return readhelp;
 }
 
-void projectviewer::setprojContent(QFile* input)
+void projectviewer::setprojContent(QFile* input, QCustomPlot* _plotArea)
 {
 	QString err_msg; int err_line; int err_column;
+	plotArea = _plotArea;
 	doc.clear();
 	clear();
 	bool set_cont = doc.setContent(input, &err_msg, &err_line, &err_column);
@@ -179,9 +180,15 @@ void projectviewer::itemClicked(QModelIndex  index)
 		QString name = node.nodeName();
 
 		if (name == "dispersionFileName" || pname == "dispersionFileName" ||
-			name == "voltage" || pname == "voltage" ) emit setVisiblePlot(0);
-		if (name == "logitudinalStructureFile" || pname == "logitudinalStructureFile") emit setVisiblePlot(1);
-		if (name == "fieldFileName" || pname == "fieldFileName") emit setVisiblePlot(2);
+			name == "voltage" || pname == "voltage") emit setVisiblePlot(0);
+		if (name == "longitudinalStructureFile" || pname == "longitudinalStructureFile"
+			|| name == "fieldFileName" || pname == "fieldFileName" 
+			|| name == "QStructureFile" || pname == "QStructureFile") 
+		{
+			setPlot(plotArea, (char*)name.data(), 50, nullptr);
+			setPlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
+			emit setVisiblePlot(1);
+		}
 		
 	}
 
@@ -344,24 +351,29 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 {
 	char fileName[200];
 	QDomNode LFsection = doc.elementsByTagName("LFsection").item(0);
-	if (LFsection.isNull()){	browser->append("<b>LFsection entry is not found</b>"); return;}
-	if (!setXMLEntry(&LFsection, "period", &period)) { browser->append("<b>LFsection period is not found</b>"); return; }
+	if (LFsection.isNull() 
+		&& browser != nullptr){	browser->append("<b>LFsection entry is not found</b>"); return;}
+	if (!setXMLEntry(&LFsection, "period", &period)
+		&& browser != nullptr){ browser->append("<b>LFsection period is not found</b>"); return; }
 	plot->clearGraphs();
 	
-	Interpolation *interpolation;
+	Interpolation *interpolation = plotInterpol;
 
 	double k1;
 	 
 	setXMLEntry(&doc, "frequency", &k1, &iteratedParams, &iteratedNames);	k1 *= 2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
-	QVector<double> x(Npoints + 2);
-	QVector<double> y(Npoints + 2);
+	QVector<double> x;
+	QVector<double> y;
 	if (setXMLEntry(&doc, entryName, fileName))
 	{
 		if (!QFile(QString(fileName)).exists()) {
 			browser->append("<b><font color = \"red\">Error</font></b> reading file <b>" + QString(fileName) + "</b>"); 
 			return;
 		}
-		interpolation = new Interpolation(fileName);
+		if (interpolation == nullptr)
+			interpolation = new Interpolation(fileName);
+		else
+			interpolation->reload(fileName);
 	
 		
 		double max = interpolation->xMax();

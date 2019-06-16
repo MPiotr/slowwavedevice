@@ -16,7 +16,7 @@ class projectviewer : public QStandardItemModel
 
 public:
 	projectviewer();
-	void setprojContent(QFile *inputfile);
+	void setprojContent(QFile *inputfile, QCustomPlot* plotArea);
 	~projectviewer();
 	bool setData(const QModelIndex & index, const QVariant & value, int role);
 	QDomDocument getDoc();
@@ -41,6 +41,9 @@ signals:
 
 private:
 	QDomDocument doc; 
+
+	QCustomPlot *plotArea = nullptr;
+	Interpolation *plotInterpol = nullptr;
 	
 	void addNode(QDomNode *, QStandardItem  *);
 	void addOnlyNode(QDomNode *, QStandardItem  *, int );

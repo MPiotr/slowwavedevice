@@ -207,7 +207,7 @@ void slowwavedevice::showPlot(int n)
 		couplingPlot->setVisible(true);
 		couplingPlot->replot();
 	}
-	if (n == 3)
+	if (n == 2)
 	{
 		resultPlot->setVisible(true);
 		qplot->setVisible(false);
@@ -287,10 +287,10 @@ void slowwavedevice::openFileFun(QString inputFile)
 		return;
 	}
 	setWindowTitle("Slow-wave device solver: " + inputFile);
-	projmodel->setprojContent(&input);
+	projmodel->setprojContent(&input, couplingPlot);
 	ui.treeView->expandAll();
 	projmodel->setDispersionsPlot(qplot, ui.textBrowser, 50);
-	projmodel->setPlot(couplingPlot, "logitudinalStructureFile", 50, ui.textBrowser);
+	projmodel->setPlot(couplingPlot, "longitudinalStructureFile", 50, ui.textBrowser);
 	qplot->replot();
 	input.close();
 

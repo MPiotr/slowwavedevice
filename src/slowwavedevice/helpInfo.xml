@@ -37,7 +37,7 @@
     </groupSpeed>
     <fieldFileName type="filename" usage = "fieldFileName OR periodNorma">Имя файла с поперечной структурой поля; csv формат</fieldFileName>
     <dispersionFileName type="filename" usage = "dispersionFileName OR (frequency AND angle)">Имя файла с дисперсионной характеристикой - зависимоть частоты волны, в ГГц, от набега фазы на одном периоде, в градусах, в виде csv файла, лежащего в рабочей директории</dispersionFileName>
-    <logitudinalStructureFile type="filename" usage="optionally">Продольный профиль синхронной гармоник</logitudinalStructureFile>
+    <logitudinalStructureFile type="filename" usage="optionally" unit="mm">Продольный профиль синхронной гармоник</logitudinalStructureFile>
 	<magneticField usage ="optionally,TWT_1D,TWT_0D" unit ="T">Величина магнитного поля в Теслах</magneticField>
 	<maxTransversalBeta usage = "optionally,TWT_1D,TWT_0D" unit="none">Величина максимальной поперечной скорости (нормированная на скорость света)</maxTransversalBeta>
    </LFsection>
