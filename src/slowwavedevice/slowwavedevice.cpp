@@ -42,8 +42,6 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	ui.menuBar->show();
 	ui.textBrowser->setFontFamily("Consolas");
 
-
-//	solverProcess.setProgram("\"F:\\Piotr\\Visual Studio Projects\\cudaSlowWaveDeviceSolver\\Release\\cudaSlowWaveDeviceSolver.exe\"");
 	solverProcess.setProgram("\"cudaSlowWaveDeviceSolver.exe\"");
 	QStringList args; args.append("control");
 	solverProcess.setArguments(args);
