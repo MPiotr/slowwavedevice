@@ -171,21 +171,22 @@ void projectviewer::itemClicked(QModelIndex  index)
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(index);
 	QDomElement current = currentItem->node.toElement();
 	StandardXMLItem *parentItem = (StandardXMLItem *)itemFromIndex(parent(index));
-	QString pname = currentItem->node.nodeName();
+	QString name = currentItem->node.nodeName();
 
 	if (parentItem && !parentItem->node.isNull())
 	{
 		QDomNode node = parentItem->node;
 		QDomNode  parentparent = node.parentNode();
-		QString name = node.nodeName();
+		QString parname = node.nodeName();
 
-		if (name == "dispersionFileName" || pname == "dispersionFileName" ||
-			name == "voltage" || pname == "voltage") emit setVisiblePlot(0);
-		if (name == "longitudinalStructureFile" || pname == "longitudinalStructureFile"
-			|| name == "fieldFileName" || pname == "fieldFileName" 
-			|| name == "QStructureFile" || pname == "QStructureFile") 
+		if (parname == "dispersionFileName" || name == "dispersionFileName" ||
+			parname == "voltage" || name == "voltage") emit setVisiblePlot(0);
+		if (parname == "longitudinalStructureFile"	|| parname == "fieldFileName" || parname == "QStructureFile") 
 		{
-			setPlot(plotArea, (char*)name.data(), 50, nullptr);
+			setPlot(plotArea, parname.toLocal8Bit().data(), 50, nullptr);
+			emit setVisiblePlot(1);
+		}
+		if (name == "longitudinalStructureFile"||  name == "fieldFileName"|| name == "QStructureFile") {
 			setPlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
 			emit setVisiblePlot(1);
 		}
