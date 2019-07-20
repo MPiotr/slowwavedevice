@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>804</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -95,6 +95,7 @@
    </attribute>
    <addaction name="action"/>
    <addaction name="AbortAction"/>
+   <addaction name="CalculateDispersionAction"/>
    <addaction name="separator"/>
    <addaction name="OpenAction"/>
    <addaction name="SaveAction"/>
@@ -105,7 +106,7 @@
   <action name="action">
    <property name="icon">
     <iconset resource="slowwavedevice.qrc">
-     <normaloff>:/slowwavedevice/Resources/start_icon_24x21.bmp</normaloff>:/slowwavedevice/Resources/start_icon_24x21.bmp</iconset>
+     <normaloff>:/slowwavedevice/Resources/start2.png</normaloff>:/slowwavedevice/Resources/start2.png</iconset>
    </property>
    <property name="text">
     <string>Запуск</string>
@@ -165,6 +166,18 @@
    </property>
    <property name="toolTip">
     <string>Прервать вычисления</string>
+   </property>
+  </action>
+  <action name="CalculateDispersionAction">
+   <property name="icon">
+    <iconset resource="slowwavedevice.qrc">
+     <normaloff>:/slowwavedevice/Resources/meshedPeriod.png</normaloff>:/slowwavedevice/Resources/meshedPeriod.png</iconset>
+   </property>
+   <property name="text">
+    <string>Рассчитать дисперсию</string>
+   </property>
+   <property name="toolTip">
+    <string>Рассчитывает дисперсию исходя из профиля указанного в periodShape</string>
    </property>
   </action>
  </widget>

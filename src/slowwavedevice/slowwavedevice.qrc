@@ -1,11 +1,12 @@
 <RCC>
-    <qresource prefix="/slowwavedevice">
-        <file>Resources/start_icon_24x21.bmp</file>
-        <file>Resources/icon.png</file>
-        <file>Resources/saveas.png</file>
-        <file>Resources/148705-essential-collection/png/save.png</file>
-        <file>Resources/148705-essential-collection/png/exit-1.png</file>
-        <file>Resources/148705-essential-collection/png/folder-10.png</file>
-        <file>Resources/148705-essential-collection/png/stop.png</file>
-    </qresource>
+  <qresource prefix="/slowwavedevice">
+    <file>Resources/148705-essential-collection/png/save.png</file>
+    <file>Resources/saveas.png</file>
+    <file>Resources/icon.png</file>
+    <file>Resources/148705-essential-collection/png/exit-1.png</file>
+    <file>Resources/148705-essential-collection/png/folder-10.png</file>
+    <file>Resources/148705-essential-collection/png/stop.png</file>
+    <file>Resources/meshedPeriod.png</file>
+    <file>Resources/start2.png</file>
+  </qresource>
 </RCC>
