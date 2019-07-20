@@ -24,9 +24,11 @@ public:
 	QString problemName;
 	void setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints);
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
+	void setTablePlot(QCustomPlot *plot, char *entryname, int Npoints, QTextBrowser *);
 	double period;	
 	QTextBrowser *debugBrowser;
 	QDomDocument toolTipsXML;
+	void recalculatePeriodFromShape(QTextBrowser *browser);
 
 	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);
 public slots:

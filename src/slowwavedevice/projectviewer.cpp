@@ -1,3 +1,6 @@
+#include <fstream>
+#include <vector>
+#include <algorithm>
 #include "projectviewer.h"
 #include "standartxmlitem.h"
 #include "projviewmenuaction.h"
@@ -71,7 +74,7 @@ void projectviewer::setprojContent(QFile* input, QCustomPlot* _plotArea)
 // ----------
 
 }
-void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1) //Adds only one node without recuresion. Used for toggling iterate
+void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int insertrow = -1) //Adds only one node without recurssion. Used for toggling iterate
 {
 	QString elementName = node->nodeName();
 	QDomNode helperNode = toolTipsXML.elementsByTagName(elementName).at(0);
@@ -186,8 +189,17 @@ void projectviewer::itemClicked(QModelIndex  index)
 			setPlot(plotArea, parname.toLocal8Bit().data(), 50, nullptr);
 			emit setVisiblePlot(1);
 		}
-		if (name == "longitudinalStructureFile"||  name == "fieldFileName"|| name == "QStructureFile") {
+		if (name == "longitudinalStructureFile"||  name == "fieldFileName"|| name == "QStructureFile")
+		{
 			setPlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
+			emit setVisiblePlot(1);
+		}
+		if (name == "periodShape") {
+			setTablePlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
+			emit setVisiblePlot(1);
+		}
+		if (parname == "periodShape") {
+			setTablePlot(plotArea, parname.toLocal8Bit().data(), 50, nullptr);
 			emit setVisiblePlot(1);
 		}
 		
@@ -273,7 +285,7 @@ void projectviewer::setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, in
 	Interpolation *interpolation;
 
 	double k1, fre;
-	plot->clearGraphs();
+	plot->clearPlottables();
 	setXMLEntry(&doc, "frequency", &fre, &iteratedParams, &iteratedNames);	k1 = fre*2 * M_PI / 299.8;    	//волновое число (частота возбуждения)
 	QVector<double> x(Npoints + 1);
 	QVector<double> y(Npoints + 1);
@@ -356,7 +368,7 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 		&& browser != nullptr){	browser->append("<b>LFsection entry is not found</b>"); return;}
 	if (!setXMLEntry(&LFsection, "period", &period)
 		&& browser != nullptr){ browser->append("<b>LFsection period is not found</b>"); return; }
-	plot->clearGraphs();
+	plot->clearPlottables();
 	
 	Interpolation *interpolation = plotInterpol;
 
@@ -396,6 +408,43 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 	}
 	else return;
 }
+void projectviewer::setTablePlot(QCustomPlot *plot, char* entryName, int Npoints, QTextBrowser *browser)
+{
+	char fileName[200];
+	plot->clearPlottables();
+	QVector<double> x;
+	QVector<double> y;
+	if (setXMLEntry(&doc, entryName, fileName))
+	{	
+		FILE *file = fopen(fileName, "r");			
+		if (file == nullptr) {
+			browser->append("<b><font color = \"red\">Error</font></b> opening file <b>" + QString(fileName) + "</b>");
+			return;
+		}
+		//std::ifstream input(file);
+		float _x, _y;
+		while (fscanf(file, "%g,%g\n", _x, _y) == 2)
+		{
+			//input >> _x >> _y;
+			x.push_back(_x);
+			y.push_back(_y);
+		}
+		fclose(file);
+		
+
+		plot->addGraph();
+		QCPCurve* curve = new QCPCurve(plot->graph(0)->keyAxis(), plot->graph(0)->valueAxis());
+		QPen pen(Qt::darkGreen);
+		pen.setWidth(2);
+		curve->setData(x, y);
+		curve->setPen(pen);
+		curve->rescaleAxes();
+		plot->addPlottable(curve);
+		//plot->graph(0)->rescaleAxes();
+	}
+	else return;
+}
+
 void projectviewer::toggleIterate(QModelIndex* index)
 {
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(*index);
@@ -451,6 +500,36 @@ void projectviewer::toggleIterate(QModelIndex* index)
 
 	}
 	QString tmp = doc.toString();
+
+
+}
+
+void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
+{
+	char fileName[200];
+	if (!setXMLEntry(&doc, "preiodShape", fileName)) return;
+	FILE *file = fopen(fileName, "r");
+	if (file == nullptr) {
+		browser->append("<b><font color = \"red\">Error</font></b> opening file <b>" + QString(fileName) + "</b>");
+		return;
+	}
+	//std::ifstream input(file);
+	std::vector<double> x;
+	std::vector<double> y;
+	float _x, _y;
+	while (fscanf(file, "%g,%g\n", _x, _y) == 2)
+	{
+		//input >> _x >> _y;
+		x.push_back(_x);
+		y.push_back(_y);
+	}
+	fclose(file);
+
+	double xmax = *std::max_element(begin(x), end(x));
+	double xmin = *std::min_element(begin(x), end(x));
+	
+	double period = xmax - xmin;
+
 
 
 }

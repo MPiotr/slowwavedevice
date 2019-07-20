@@ -8,10 +8,10 @@
    <beamStructureGap unit="mm"> Зазор между структурой и пучком в миллиметрах (неактивена, если задано fieldFileName)
      <disabledby value="fieldFileName"/>
    </beamStructureGap>
-   <beamWidth unit="mm">Ширина пучка в миллиметрах (неактивена, если задано fieldFileName)
+   <beamWidth unit="mm">Ширина пучка в миллиметрах (не активна, если задано fieldFileName)
    <disabledby value="fieldFileName"/>
    </beamWidth>
-   <beamHeight unit="mm">Высота пучка в миллиметрах (неактивена, если задано fieldFileName)
+   <beamHeight unit="mm">Высота пучка в миллиметрах (не активна, если задано fieldFileName)
    <disabledby value="fieldFileName"/>
    </beamHeight>
    <angle unit = "degree">Угол синхронизма в градусах (если задано dispersionFileName используется как начальная точка для итераций)</angle>
