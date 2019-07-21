@@ -41,7 +41,6 @@ signals:
 	void errorOpeningFile(QString line, int row, int column);
 	void voltageChanged(QString newvalue);
 	void setVisiblePlot(int plotNum);
-	void recalculatePeriodFromShape(QTextBrowser *);
 
 private:
 	QDomDocument doc; 
