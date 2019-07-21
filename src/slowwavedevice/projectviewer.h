@@ -25,6 +25,7 @@ public:
 	QString problemName;
 	void setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints);
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
+	void setTablePlot(QCustomPlot *plot, char* entryName, int Npoints, QTextBrowser *browser);
 	double period;	
 	QTextBrowser *debugBrowser;
 	QDomDocument toolTipsXML;
@@ -39,6 +40,7 @@ signals:
 	void errorOpeningFile(QString line, int row, int column);
 	void voltageChanged(QString newvalue);
 	void setVisiblePlot(int plotNum);
+	void recalculatePeriodFromShape(QTextBrowser *);
 
 private:
 	QDomDocument doc; 
