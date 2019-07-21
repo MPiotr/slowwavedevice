@@ -108,6 +108,7 @@ void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int inser
 				thisItemName->appendRow(thisItemValue);
 			}
 		}
+		nameToIndex[elementName] = thisItemValue->index();
 	}
 	if (elementName == "problemName") problemName = node->toElement().text();
 
@@ -135,7 +136,7 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 			thisItemName->setToolTip(nodevalue);
 		}
 		parent->appendRow(thisItemName);
-
+		
 		int par = 0;
 		if (setXMLattribute(node, "iterable", &par)){
 			StandardXMLItem* iter = new StandardXMLItem("iterable");
@@ -152,6 +153,7 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 			else
 			{
 				thisItemName->appendRow(thisItemValue);
+				nameToIndex[elementName] = thisItemValue->index();
 			}
 		}
 	}
@@ -396,6 +398,42 @@ void projectviewer::setPlot(QCustomPlot *plot, char* entryName, int Npoints, QTe
 	}
 	else return;
 }
+void projectviewer::setTablePlot(QCustomPlot *plot, char* entryName, int Npoints, QTextBrowser *browser)
+{
+	char fileName[200];
+	plot->clearPlottables();
+	QVector<double> x;
+	QVector<double> y;
+	if (setXMLEntry(&doc, entryName, fileName))
+	{	
+		FILE *file = fopen(fileName, "r");			
+		if (file == nullptr) {
+			browser->append("<b><font color = \"red\">Error</font></b> opening file <b>" + QString(fileName) + "</b>");
+			return;
+		}
+		//std::ifstream input(file);
+		float _x, _y;
+		while (fscanf(file, "%g,%g\n", &_x, &_y) == 2)
+		{
+			//input >> _x >> _y;
+			x.push_back(_x);
+			y.push_back(_y);
+		}
+		fclose(file);
+		
+
+		plot->addGraph();
+		QCPCurve* curve = new QCPCurve(plot->graph(0)->keyAxis(), plot->graph(0)->valueAxis());
+		QPen pen(Qt::darkGreen);
+		pen.setWidth(2);
+		curve->setData(x, y);
+		curve->setPen(pen);
+		curve->rescaleAxes();
+		plot->addPlottable(curve);
+		//plot->graph(0)->rescaleAxes();
+	}
+	else return;
+}
 void projectviewer::toggleIterate(QModelIndex* index)
 {
 	StandardXMLItem *currentItem = (StandardXMLItem *)itemFromIndex(*index);
@@ -453,4 +491,48 @@ void projectviewer::toggleIterate(QModelIndex* index)
 	QString tmp = doc.toString();
 
 
+}
+
+void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
+{
+	char fileName[200];
+	if (!setXMLEntry(&doc, "periodShape", fileName)) {
+		browser->append("<b><font color = \"red\">Error</font></b> XML entry <b>periodShape</b> not found");
+		return;
+	}
+	FILE *file = fopen(fileName, "r");
+	if (file == nullptr) {
+		browser->append("<b><font color = \"red\">Error</font></b> opening file <b>" + QString(fileName) + "</b>");
+		return;
+	}
+	//std::ifstream input(file);
+	std::vector<double> x;
+	std::vector<double> y;
+	float _x, _y;
+	while (fscanf(file, "%g,%g\n", &_x, &_y) == 2)
+	{
+		//input >> _x >> _y;
+		x.push_back(_x);
+		y.push_back(_y);
+	}
+	fclose(file);
+
+	double xmax = *std::max_element(begin(x), end(x));
+	double xmin = *std::min_element(begin(x), end(x));
+	
+	double period = xmax - xmin;
+
+	auto el = doc.elementsByTagName("period").at(0);
+	el.replaceChild(doc.createTextNode(QString::number(period)), el.firstChild());
+
+	auto periodIndex = nameToIndex["period"];
+	auto periodItem = itemFromIndex(periodIndex);
+
+	if (periodItem == nullptr) {
+		browser->append("<b><font color = \"red\">Error</font></b> can't find 'period' item");
+		return;
+	}
+	periodItem->setText(QString::number(period));
+	
+	
 }

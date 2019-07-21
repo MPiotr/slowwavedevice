@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include <QDomDocument>
 #include <qstandarditemmodel.h>
+#include <map>
 #include <qfile.h>
 #include <qabstractxmlreceiver.h>
 #include "qcustomplot.h"
@@ -50,6 +51,9 @@ private:
 
 	vector< vec > iteratedParams;
 	vector< string > iteratedNames;
+
+	map<QString, QModelIndex> nameToIndex;
+
 	QIcon checkedIcon;
 	QIcon uncheckedIcon;
 

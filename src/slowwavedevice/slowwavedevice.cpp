@@ -52,6 +52,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	connect(ui.ExitAction, SIGNAL(triggered()), this, SLOT(exit()));
 	connect(ui.AbortAction, SIGNAL(triggered()), this, SLOT(abortSolver()));
 	connect(ui.action, SIGNAL(triggered()), this, SLOT(start()));
+	connect(ui.CalculateDispersionAction, SIGNAL(triggered()), this, SLOT(calculateDispersion()));
 	connect(ui.AboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(&solverProcess, static_cast< void(QProcess::*)(int, QProcess::ExitStatus) > (&QProcess::finished),
 		[=](int exitCode, QProcess::ExitStatus exitStatus){
@@ -153,6 +154,11 @@ void slowwavedevice::start()
 	ui.textBrowser->append(solverProcess.readAllStandardOutput());
 	
 }
+void slowwavedevice::calculateDispersion() {
+//	dispersionProcess.setProgram("shape2mesh.exe");
+	projmodel->recalculatePeriodFromShape(ui.textBrowser);
+}
+
 void slowwavedevice::abortSolver()
 {
 	solverProcess.kill();
@@ -380,6 +386,7 @@ void slowwavedevice::enableButtons()
 	ui.SaveAsAction->setEnabled(true);
 	ui.ExitAction->setEnabled(true);
 	ui.OpenAction->setEnabled(true);
+	ui.CalculateDispersionAction->setEnabled(true);
 	ui.AbortAction->setEnabled(false);
 }
 void slowwavedevice::disableButtons()
@@ -390,6 +397,7 @@ void slowwavedevice::disableButtons()
 	ui.SaveAsAction->setEnabled(false);
 	ui.ExitAction->setEnabled(false);
 	ui.OpenAction->setEnabled(false);
+	ui.CalculateDispersionAction->setEnabled(false);
 	ui.AbortAction->setEnabled(true);
 }
 void slowwavedevice::showAbout()
