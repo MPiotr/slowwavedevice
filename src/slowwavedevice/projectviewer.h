@@ -4,6 +4,7 @@
 #include <QTreeView>
 #include <QDomDocument>
 #include <qstandarditemmodel.h>
+#include <map>
 #include <qfile.h>
 #include <qabstractxmlreceiver.h>
 #include "qcustomplot.h"
@@ -24,7 +25,7 @@ public:
 	QString problemName;
 	void setDispersionsPlot(QCustomPlot *plot, QTextEdit* console, int Npoints);
 	void setPlot(QCustomPlot *plot, char *entryname,  int Npoints, QTextBrowser *);
-	void setTablePlot(QCustomPlot *plot, char *entryname, int Npoints, QTextBrowser *);
+	void setTablePlot(QCustomPlot *plot, char* entryName, int Npoints, QTextBrowser *browser);
 	double period;	
 	QTextBrowser *debugBrowser;
 	QDomDocument toolTipsXML;
@@ -40,6 +41,7 @@ signals:
 	void errorOpeningFile(QString line, int row, int column);
 	void voltageChanged(QString newvalue);
 	void setVisiblePlot(int plotNum);
+	void recalculatePeriodFromShape(QTextBrowser *);
 
 private:
 	QDomDocument doc; 
@@ -52,6 +54,9 @@ private:
 
 	vector< vec > iteratedParams;
 	vector< string > iteratedNames;
+
+	map<QString, QModelIndex> nameToIndex;
+
 	QIcon checkedIcon;
 	QIcon uncheckedIcon;
 

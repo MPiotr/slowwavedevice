@@ -44,6 +44,7 @@ private:
 	QSharedMemory sharedMemoryResult;
 
 	QProcess solverProcess;
+	QProcess dispersionProcess;
 	QToolBar *toolbar;
 	QDialog aboutDialog;
 	
@@ -83,6 +84,7 @@ private slots:
 	void abortSolver();
 	void readConsole();
 	void showAbout();
+	void calculateDispersion();
 };
 
 #endif // SLOWWAVEDEVICE_H

@@ -111,6 +111,7 @@ void projectviewer::addOnlyNode(QDomNode *node, QStandardItem *parent, int inser
 				thisItemName->appendRow(thisItemValue);
 			}
 		}
+		nameToIndex[elementName] = thisItemValue->index();
 	}
 	if (elementName == "problemName") problemName = node->toElement().text();
 
@@ -138,7 +139,7 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 			thisItemName->setToolTip(nodevalue);
 		}
 		parent->appendRow(thisItemName);
-
+		
 		int par = 0;
 		if (setXMLattribute(node, "iterable", &par)){
 			StandardXMLItem* iter = new StandardXMLItem("iterable");
@@ -155,6 +156,7 @@ void projectviewer::addNode(QDomNode *node, QStandardItem *parent)
 			else
 			{
 				thisItemName->appendRow(thisItemValue);
+				nameToIndex[elementName] = thisItemValue->index();
 			}
 		}
 	}
@@ -423,7 +425,7 @@ void projectviewer::setTablePlot(QCustomPlot *plot, char* entryName, int Npoints
 		}
 		//std::ifstream input(file);
 		float _x, _y;
-		while (fscanf(file, "%g,%g\n", _x, _y) == 2)
+		while (fscanf(file, "%g,%g\n", &_x, &_y) == 2)
 		{
 			//input >> _x >> _y;
 			x.push_back(_x);
@@ -507,7 +509,10 @@ void projectviewer::toggleIterate(QModelIndex* index)
 void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
 {
 	char fileName[200];
-	if (!setXMLEntry(&doc, "preiodShape", fileName)) return;
+	if (!setXMLEntry(&doc, "periodShape", fileName)) {
+		browser->append("<b><font color = \"red\">Error</font></b> XML entry <b>periodShape</b> not found");
+		return;
+	}
 	FILE *file = fopen(fileName, "r");
 	if (file == nullptr) {
 		browser->append("<b><font color = \"red\">Error</font></b> opening file <b>" + QString(fileName) + "</b>");
@@ -517,7 +522,7 @@ void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
 	std::vector<double> x;
 	std::vector<double> y;
 	float _x, _y;
-	while (fscanf(file, "%g,%g\n", _x, _y) == 2)
+	while (fscanf(file, "%g,%g\n", &_x, &_y) == 2)
 	{
 		//input >> _x >> _y;
 		x.push_back(_x);
@@ -530,6 +535,17 @@ void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
 	
 	double period = xmax - xmin;
 
+	auto el = doc.elementsByTagName("period").at(0);
+	el.replaceChild(doc.createTextNode(QString::number(period)), el.firstChild());
 
+	auto periodIndex = nameToIndex["period"];
+	auto periodItem = itemFromIndex(periodIndex);
 
+	if (periodItem == nullptr) {
+		browser->append("<b><font color = \"red\">Error</font></b> can't find 'period' item");
+		return;
+	}
+	periodItem->setText(QString::number(period));	
+	
 }
+
