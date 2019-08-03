@@ -72,7 +72,7 @@
     <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0;C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\ucrt;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
