@@ -31,6 +31,14 @@ public:
 	QDomDocument toolTipsXML;
 	void recalculatePeriodFromShape(QTextBrowser *browser);
 
+	bool savePeriodParamsForDispersionCalculation(QFile* file) const;
+	bool getShapeFileName(QString *name);
+	int  getNumCores();
+	double getPeriod();
+	double getRefFreq();
+	QString getDispersionFileName();
+
+
 	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);
 public slots:
 	void itemChanged(QModelIndex);

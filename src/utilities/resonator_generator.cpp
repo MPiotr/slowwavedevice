@@ -36,7 +36,11 @@ int main(int argc, char** argv)
 	if (argc == 3)
 		sscanf(argv[2], "%g", &stepsize);
 
+	printf("Border Inpur generation \nOpening %s file\n", filename);
+
 	FILE* inp = fopen(input, "r");
+	if (inp == nullptr) {		printf("Error opening %s\n", filename); return 1;	}
+
 	float x, y;
 
 	int ind = 0;
@@ -48,13 +52,18 @@ int main(int argc, char** argv)
 	ind--; //The shape in input is closed: i.e. first and last vertices are the same
 	       //this will cause an error while mesh generation. Exclude one (last) vertex
 
+	printf("Generating `mesh.mesh` border file...\n");
 	double xmin, xmax, ymin, ymax;
 	minmax(Y, ind, &ymin, &ymax);
 	minmax(X, ind, &xmin, &xmax);
 
-	if (stepsize == -1) {
-		stepsize = float((ymax - ymin) / 30.);
+	if (stepsize == -1) {		
+		stepsize = float((ymax - ymin) / 50.);
+		printf("Mesh step is not specified, setting (Ymax - Ymin)/50 = %g\n", stepsize);
 	}
+	else
+		printf("Mesh step is specified. %g", stepsize);
+
 	int vert = ind;
 
 	FILE *output = fopen(filename, "w");
@@ -76,5 +85,7 @@ int main(int argc, char** argv)
 		fprintf(output, "%g\n", stepsize);
 
 	fclose(output);
-	
+
+	printf("                                     Done\n");
+	return 0;	
 }

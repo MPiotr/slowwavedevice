@@ -8,6 +8,7 @@
 #include <qprocess.h>
 #include <qbuffer.h>
 #include "projectviewer.h"
+#include "dispersioncalculatorcontroller.h"
 
 #include "ui_slowwavedevice.h"
 #include "ui_aboutDialog.h"
@@ -21,6 +22,7 @@ public:
 	~slowwavedevice();
 
 private:
+	enum activeProcess  { none,  solver, dispersion };
 	Ui::slowwavedeviceClass ui;
 	Ui::Dialog about;
 
@@ -44,7 +46,6 @@ private:
 	QSharedMemory sharedMemoryResult;
 
 	QProcess solverProcess;
-	QProcess dispersionProcess;
 	QToolBar *toolbar;
 	QDialog aboutDialog;
 	
@@ -66,6 +67,9 @@ private:
 	void createResultPlot(int Npoints);
 	void updateResultPlot(int Npoints);
 
+	DispersionCalculatorController *dispCalcContoller;
+	activeProcess whoIsActive;
+
 signals:
 	void projmodelContextMenu(QTreeView *, QModelIndex, QPoint);
 public	slots: 
@@ -81,6 +85,7 @@ private slots:
 	void loadFile();
 	void start();
 	void solverFinished(int sig, QProcess::ExitStatus stat);
+	void dispersionCalcFinished(int exitstatus);
 	void abortSolver();
 	void readConsole();
 	void showAbout();

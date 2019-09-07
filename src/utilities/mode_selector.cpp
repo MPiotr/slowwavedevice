@@ -10,6 +10,8 @@
 
 using namespace std;
 
+const double Pi = 3.141592653589793238462643383279502884;
+
 vector< DataRow >::iterator selectNext(vector< DataRow >::iterator & nose, vector< DataRow>::iterator & tail, 
 	                                   double & y, double  &vy, const double alpha) 
 {
@@ -31,7 +33,7 @@ void selectFirst(vector<DataRow >::iterator & nose, vector<DataRow >::iterator &
 	             const  vector<DataRow>::iterator & dataend,
 	             vector<vector<DataRow > >& modes,
 	                    vector<double> & y, vector<double> & vy,
-	                    int num_modes) 
+	                    int num_modes, double refVal = -111) 
 {
 
 	while ((*nose).key() == (*tail).key() && tail != dataend )
@@ -52,6 +54,18 @@ void selectFirst(vector<DataRow >::iterator & nose, vector<DataRow >::iterator &
 		vy[i] = 0;		
 	}
 
+	// Sorting for the first mode to be the closest to the reference
+	if(refVal != -111) {
+	sort(begin(y), begin(y) + num_modes,
+		[refVal](double a, double b) { return fabs(a - refVal) < fabs(b - refVal); });
+	sort(begin(modes), begin(modes) + num_modes,
+		[refVal](vector<DataRow> a, vector<DataRow> b) { return fabs(a[0].val() - refVal) < fabs(b[0].val() - refVal); });
+	}
+	for (int i = 0; i < num_modes; i++) {
+		cout << "i=" << i << ",  " << y[i]*299.8/(2.*Pi) << ";  ";
+	}
+	cout << endl;
+
 }
 
 void moveIterators(vector<DataRow>::iterator & nose,  vector<DataRow >::iterator & tail,
@@ -64,16 +78,16 @@ void moveIterators(vector<DataRow>::iterator & nose,  vector<DataRow >::iterator
 		tail++;	
 }
 
-vector<vector<DataRow> > propagate(vector<DataRow> &data, int num_modes, double alpha) {
+vector<vector<DataRow> > propagate(vector<DataRow> &data, int num_modes, double alpha, double refFreq) {
 	vector<vector<DataRow> > modes(num_modes);
 	vector<DataRow>::iterator nose, tail;
 
 	nose = data.begin();
 	tail = data.begin();
-	vector<double> vy(num_modes);
-	vector<double>  y(num_modes);
+	vector<double> vy(num_modes);   //current step velocities
+	vector<double>  y(num_modes);   //current step values
 
-	selectFirst(nose, tail, data.end(), modes, y, vy, num_modes);
+	selectFirst(nose, tail, data.end(), modes, y, vy, num_modes, refFreq);
 
 	while(true) {
 		vector<double> next_data(num_modes);
@@ -91,25 +105,37 @@ vector<vector<DataRow> > propagate(vector<DataRow> &data, int num_modes, double 
 
 int main(int argc, char** argv)
 {
+	cout << "------------------  Mode Selector start -------------------------" << endl;
 	cout << "arc = " << argc << endl;
 	if (argc < 6) {
-		cout << "Usage: modeselector [input - csv-file] [key_column - zero-based] [value_column - zero-based] [num_modes] [output prefix] <optionally: alpha [def 0.8]>" << endl;
+		cout << "Usage: modeselector [input - csv-file] [key_column - zero-based] [value_column - zero-based] [num_modes] [output prefix]";
+		cout << "optionally: alpha [def 0.8]> <optionally: period [def 1.]> <optionally: reference frequency [def 0.]>" << endl;
 		return 1;
 	}
 	string input_file = argv[1];
-	string prefix = argv[5];
 	int key_column = stoi(argv[2]);
 	int value_column = stoi(argv[3]);
 	int num_modes = stoi(argv[4]);
+	string prefix = argv[5];
+
 	double alpha = 0.8;
-	if (argc >= 6)
+	double d = 1;
+	double freq = 0.;
+	if (argc >= 7)
 		alpha = stod(argv[6]);
+	if (argc >= 8)
+		d = stod(argv[7]);
+	if (argc >= 9)
+		freq = stod(argv[8]);
+
+	cout << "input file = " << input_file << ", key_column = " << key_column << ", value_column = " << value_column
+		 << ", num_modes = "<< num_modes  << ", output prefix = " << prefix << ", alpha = " << alpha 
+		 <<", period = "<< d <<", reference frequency = "<< freq<< endl;
 		
-
-
-//	int key_column = 3, value_column = 4, num_modes = 4;
 	auto data = readData(input_file, key_column, value_column);
-	auto res = propagate(data, num_modes, alpha);
-	writeData(prefix, res);
+	auto res = propagate(data, num_modes, alpha, 2.*Pi*freq/299.8);
+	writeData(prefix + "_full", res);
+	writeData(prefix , res, key_column, value_column, 360./(2.*Pi/d), 299.8/(2.*Pi) );
+	cout << "------------------  Mode Selector end -------------------------" << endl;
 }
 

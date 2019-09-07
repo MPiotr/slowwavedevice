@@ -45,6 +45,9 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	solverProcess.setProgram("\"cudaSlowWaveDeviceSolver.exe\"");
 	QStringList args; args.append("control");
 	solverProcess.setArguments(args);
+	whoIsActive = none;
+
+	dispCalcContoller = new DispersionCalculatorController(projmodel, ui.textBrowser, this);
 
 	connect(ui.OpenAction, SIGNAL(triggered()), this, SLOT(loadFile()));
 	connect(ui.SaveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
@@ -60,6 +63,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	}
 	);
 	connect(&solverProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readConsole()));
+	connect(dispCalcContoller, SIGNAL(DispersionCalculatorController::finished()), this, SLOT(dispersionCalcFinished));
 	connect(projmodel, SIGNAL(voltageChanged(QString)), this, SLOT(replotVoltage(QString)));
 	connect(projmodel, SIGNAL(setVisiblePlot(int)), this, SLOT(showPlot(int)));
 	connect(ui.treeView , SIGNAL(clicked(QModelIndex )), projmodel, SLOT(itemClicked(QModelIndex )));
@@ -149,76 +153,35 @@ void slowwavedevice::start()
 
 	showPlot(3);
 	solverProcess.start();
+	whoIsActive = solver;
 	timer.start(500);
 	
 	ui.textBrowser->append(solverProcess.readAllStandardOutput());
 	
 }
 
-void mergeDispersionFiles(QTextBrowser* textBrowser, int mpisize = 4)
-{
-	vector<vector<double>> data;
-	for (int j = 0; j < mpisize; j++)
-	{
-		QString inputFile = "dispFem" + QString::number(j) + ".csv";
-		QFile input(inputFile);
-		if (!input.open(QIODevice::ReadOnly)) {
-			textBrowser->append("<b color = \"red\">Error opening file:  </b>" + inputFile);
-			return;
-		}
-		QTextStream in(&input);
-		QString line = in.readLine();
-		while(!line.isEmpty()) {
-			auto stringlist =  line.split(",");
-			vector<double> dataline;
-			for (auto string : stringlist) {				
-				dataline.push_back(string.toDouble());
-			}
-			data.push_back(dataline);
-		}	
-	}
-
-	sort(begin(data), end(data), 
-		[](vector<double> x, vector<double> y) {
-		    if (x[1] == y[1]) return x[0] < y[0];
-		    else return x[1] < y[1];
-	});
-
-/*	char fname[200];
-	setXMLEntry( , "dispersionFileName", fname);
-	QFile input(fname);
-	if (!input.open(QIODevice::ReadOnly)) {
-		textBrowser->append("<b color = \"red\">Error opening file:  </b>" + inputFile);
-		return;
-	}*/
-}
-
 void slowwavedevice::calculateDispersion() 
 {
-	QFile output("period_parameters.tmp");
-	if (!output.open(QIODevice::WriteOnly))
-	{
-		ui.textBrowser->append("<b><font color = \"red\">Error</font></b> can't open 'period_parameters.tmp' for writing");
-		return;
-	}
-	QTextStream out(&output);
-//	out << d << Ltr << refFreq;
-
-//	dispersionProcess.setProgram("shape2mesh.exe");
-//	dispersionProcess.setProgram("mpiexec -n 4 dispersionCalculator.edp");
-//	mergeDispersionFiles();
-	projmodel->recalculatePeriodFromShape(ui.textBrowser);
+	disableButtons();
+	dispCalcContoller->calculate();
+	whoIsActive = dispersion;
 }
 
 void slowwavedevice::abortSolver()
 {
-	solverProcess.kill();
-	timer.stop();
+	if (whoIsActive == solver) {
+		solverProcess.kill();
+		timer.stop();
+	}
+	if (whoIsActive == dispersion) {
+		dispCalcContoller->abort();
+	}
+	whoIsActive = none;
 	enableButtons(); 
-	ui.textBrowser->append("<font color = \"red\">aborted by user<\font>");
+	ui.textBrowser->append("<font color = \"red\">Aborted by user<\font>");
 }
 
-void slowwavedevice::solverFinished(int sig, QProcess::ExitStatus stat)
+void slowwavedevice::solverFinished(int exitCode, QProcess::ExitStatus stat)
 {
 	timer.stop();
 	if (sharedMemoryResult.isAttached())	sharedMemoryResult.detach();
@@ -226,9 +189,24 @@ void slowwavedevice::solverFinished(int sig, QProcess::ExitStatus stat)
 	ui.textBrowser->append("<font color = \"green\">finished<\font>");
 }
 
+void slowwavedevice::dispersionCalcFinished(int exitCode)
+{
+	enableButtons();
+	if (exitCode == 0) {
+		ui.textBrowser->append("<font color = \"green\">finished<\font>");
+	}
+	else {
+		ui.textBrowser->append("<font color = \"red\">failed<\font>");
+	}
+}
+
 void slowwavedevice::readConsole()
 {
-	ui.textBrowser->append(solverProcess.readAllStandardOutput());
+	QProcess *process = nullptr;
+	if (whoIsActive == solver) 	process = &solverProcess;
+	if (process != nullptr) {
+		ui.textBrowser->append(process->readAllStandardOutput());
+	}
 }
 void slowwavedevice::replotVoltage(QString value)
 {
@@ -368,7 +346,7 @@ void slowwavedevice::openFileFun(QString inputFile)
 void slowwavedevice::readResults()
 {
 	bool att = sharedMemoryResult.isAttached();
-	if (!att)
+	if (!att )
 	{
 		if (!sharedMemoryResult.attach()) return;
 	}

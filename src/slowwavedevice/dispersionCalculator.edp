@@ -1,0 +1,96 @@
+load "Element_Mixte"
+load "Element_P3"
+
+mesh Th;
+real   Ltr,  HmaxPi, NumPer2Pi, refFreq;
+bool ifPlot;
+real d = 1.1;
+
+//int mpirank = 0;
+//int mpisize = 1;
+ofstream file("_Ez.csv");
+ofstream frefile("dispFem"+mpirank+".csv");
+ifstream paramfile("param.txt");
+	
+paramfile >> d >> Ltr >> refFreq >> HmaxPi >> NumPer2Pi; 
+
+
+real sigma=pow(2.*refFreq*29/299.8, 2);
+
+Th = buildmesh("mesh.mesh");
+
+int[int] old2new (0:Th.nv-1);
+fespace VTh (Th, P1);
+VTh sortorder = x+y;
+sort(sortorder[], old2new);
+int[int] new2old = old2new^(-1);
+
+Th = change(Th, renumv = new2old);
+
+
+if(mpirank == 0) 
+	 plot(Th, cmm = "mesh");
+
+for(real h = mpirank*pi/(d*NumPer2Pi); h <= HmaxPi*pi/d; h+= mpisize*pi/(d*NumPer2Pi))
+{
+    ifPlot = false; 
+    
+    fespace Vh(Th,[RT1Ortho, P2],  periodic = [[2,y], [4, y]]); // finite element space
+    
+    //Vh<complex> [ux,uy],[vx,vy];
+    
+    matrix<complex> OP, B;
+    
+    int nev = 10;
+    real m = 1;
+    
+    m = pi/Ltr;
+    complex[int] ev(nev);
+    Vh<complex>[int] [eVz, eVr, eVphi](nev);
+    
+    varf b([Hz,Hr, Hphi],[vHz,vHr, vHphi]) = int2d(Th)(conj(vHr)*Hr+conj(vHphi)*Hphi+conj(vHz)*Hz);
+    
+    macro odx(F) (dx(F) +  1i*h*F) //
+        
+    B = b(Vh, Vh,  solver=UMFPACK);
+    
+    varf op([Hz,Hx, Hy],[vHz,vHx, vHy]) = 
+    int2d(Th)(
+    
+        (
+        	 (dy(Hy) + m*Hx )*conj(dy(vHy)+ m*vHx ) 	    //rot_z
+         +   (odx(Hx) - dy(Hz))*conj(odx(vHx) - dy(vHz))	//rot_phi
+         +   (-m*Hz  - odx(Hy))*conj(-m*vHz  - odx(vHy))    //rot_r
+        
+        )
+        -(sigma)*(conj(vHx)*Hx+conj(vHy)*Hy + conj(vHz)*Hz)//*exp(1i*h*x)
+                 )
+        
+        	+ on(1, Hz = 0, Hx = 0,  Hy = 0)    
+    ;
+
+	OP = op(Vh, Vh, solver=UMFPACK); 
+
+	int k = EigenValue(OP, B, nev = nev, sigma = sigma, value = ev, vector = [eVz, eVr, eVphi][0], tol=1e-4,maxit=5000,ncv=25);
+	for(int i = 0; i < nev; i++)
+		cout<<i<<"    "<<sqrt(real(ev(i)))<<"    "<<sqrt(real(ev(i)))*299.8/(2.*pi)<<"\n";
+	
+	if(abs(ev(0)) > 0.25) sigma = real(ev(0));
+
+	for(int i = 0; i < nev; i++)
+	{
+		if(abs(ev(i)) > 0.25) frefile<<i<<","<<h<<","<<real(sqrt(ev(i)))<<","<<sqrt(imag(ev(i)))<<"\n";
+	}
+
+	if(ifPlot)
+	{
+		for(int i = 0; i <3; i++)
+		{
+			plot(eVz[i],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = i+": Ez");
+			plot(eVr[i],dim=2,fill=1, ColorScheme = 2, WindowIndex=2,cmm = i+": Er");
+			plot(eVphi[i],dim=2,fill=1, ColorScheme = 2,WindowIndex=2, cmm = i+": Ephi");
+		}
+	}
+}
+
+

@@ -28,21 +28,39 @@ vector<DataRow> readData(const string & filename, int key_column, int value_colu
 	return data;
 }
 
-void writeData(const string & filename, const vector<DataRow> & data)
+void writeData(const string & filename, const vector<DataRow> & data, int save_key, int save_value, double key_transform, double value_transform)
 {
 	ofstream file(filename);
 	for (auto row : data) {
-		file << row << "\n";
+		if (save_key != -1 && save_value != -1 && save_key < row.size() && save_value < row.size())
+			file << key_transform*row[save_key] << "," << value_transform*row[save_value] << "\n";
+		else 
+			file << row << "\n";
 	}
 }
 
-void writeData(const string & filename, const vector<vector<DataRow >> & data)
+void writeData(const string & filename, const vector<vector<DataRow >> & data, int save_key, int save_value, double key_transform, double value_transform)
 {
 	int counter = 0;
 	for (const auto & mode : data) {
 		ostringstream mode_file_name;
 		mode_file_name << filename << counter << ".csv";
-		writeData(mode_file_name.str(), mode);
+		cout << "writing " << mode_file_name.str() << "\n";
+		writeData(mode_file_name.str(), mode, save_key, save_value, key_transform, value_transform);
 		counter++;
+	}
+}
+
+void rescaleColumn(vector<DataRow> &data, int column, double factor)
+{
+	for (DataRow & row : data) {
+		row[column] *= factor;
+	}
+}
+
+void rescaleColumn(vector<vector<DataRow> > &data, int column, double factor)
+{ 
+	for (auto & mode : data) {
+		rescaleColumn(mode, column, factor);
 	}
 }

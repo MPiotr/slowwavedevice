@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include "projectviewer.h"
 #include "standartxmlitem.h"
 #include "projviewmenuaction.h"
@@ -549,3 +550,68 @@ void projectviewer::recalculatePeriodFromShape(QTextBrowser *browser)
 	
 }
 
+bool projectviewer::getShapeFileName(QString * name)
+{
+	char filename[300];
+	if (!setXMLEntry(&doc, "periodShape", filename)) return false;
+	*name = filename;
+	return true;
+}
+
+QString projectviewer::getDispersionFileName() 
+{
+	char filename[300];
+	if (setXMLEntry(&doc, "dispersionFileName", filename)) 
+		return QString(filename);
+
+	return QString();
+}
+
+bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file) const
+{
+	double period = 0;
+	QDomNode el = doc.elementsByTagName("LFsection").item(0);
+	if (!setXMLEntry(&el, "period", &period)) return false;
+
+	double Ltransversal;
+	el = doc.elementsByTagName("DispersionCalculation").item(0);
+	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
+	
+	double refFreq;
+	if (!setXMLEntry(&el, "referenceFrequencyForDispersion", &refFreq)) return false;
+
+	double maxH;
+	if (!setXMLEntry(&el, "maximumHForDispersion", &maxH)) maxH = 4;
+
+	double densH;
+	if (!setXMLEntry(&el, "densityHForDispersion", &densH)) densH = 33;
+
+
+	ostringstream result;
+	result << period <<" "<<Ltransversal<<" "<<refFreq<<" "<<maxH<<" "<<densH<<"\n";
+	file->write(result.str().data());
+
+	return true;
+}
+
+int projectviewer::getNumCores() 
+{
+	int numCores;
+	if (!setXMLEntry(&doc, "numCores", &numCores)) return 2;
+	return numCores;
+}
+
+double projectviewer::getPeriod()
+{
+	double res;
+	auto el = doc.elementsByTagName("LFsection").at(0);
+	if (!setXMLEntry(&el, "period", &res)) return 1;
+	return res;
+}
+double projectviewer::getRefFreq()
+{
+	double res;
+	auto el = doc.elementsByTagName("DispersionCalculation").item(0);
+	if (!setXMLEntry(&el, "referenceFrequencyForDispersion", &res)) return 0;
+	return res;
+}

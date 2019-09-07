@@ -31,6 +31,10 @@ public:
 	inline double key()       const { return data[key_col]; }
 	inline double val()       const { return data[val_col]; }
 
+	inline double operator[](int ind) const { return data[ind]; }
+
+	inline double& operator[](int ind)  { return data[ind]; }
+
 	inline string serialize() const {
 		ostringstream str;
 		for (int i = 0; i < data.size(); i++) {
