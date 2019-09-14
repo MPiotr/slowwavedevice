@@ -63,7 +63,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	}
 	);
 	connect(&solverProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readConsole()));
-	connect(dispCalcContoller, SIGNAL(DispersionCalculatorController::finished()), this, SLOT(dispersionCalcFinished));
+	connect(dispCalcContoller, SIGNAL(finished(int)), this, SLOT(dispersionCalcFinished(int)));
 	connect(projmodel, SIGNAL(voltageChanged(QString)), this, SLOT(replotVoltage(QString)));
 	connect(projmodel, SIGNAL(setVisiblePlot(int)), this, SLOT(showPlot(int)));
 	connect(ui.treeView , SIGNAL(clicked(QModelIndex )), projmodel, SLOT(itemClicked(QModelIndex )));
@@ -193,10 +193,11 @@ void slowwavedevice::dispersionCalcFinished(int exitCode)
 {
 	enableButtons();
 	if (exitCode == 0) {
-		ui.textBrowser->append("<font color = \"green\">finished<\font>");
+		ui.textBrowser->append("<font color = \"green\">Dispersion calculation has finished, reloading project<\font>");
+		openFileFun(inputFile);
 	}
 	else {
-		ui.textBrowser->append("<font color = \"red\">failed<\font>");
+		ui.textBrowser->append("<font color = \"red\">Dispersion calculation has failed<\font>");
 	}
 }
 

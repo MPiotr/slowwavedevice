@@ -36,7 +36,7 @@ public:
 	void abort();
 
 signals:
-	void finished(const int &exitStatus);
+	void finished(int exitStatus);
 
 
 };
