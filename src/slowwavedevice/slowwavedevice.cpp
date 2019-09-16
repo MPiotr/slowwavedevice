@@ -2,6 +2,7 @@
 #include "slowwavedevice.h"
 #include "customxmldelegate.h"
 
+//TODO: add calculation of the 0D wave norma from FreeFem
 
 slowwavedevice::slowwavedevice(QWidget *parent)
 	: QMainWindow(parent), sharedMemory("slowwavedevicecontroller"), sharedMemoryResult("slowwavedeviceresults"), resultStream(&resultBuffer)
@@ -193,11 +194,11 @@ void slowwavedevice::dispersionCalcFinished(int exitCode)
 {
 	enableButtons();
 	if (exitCode == 0) {
-		ui.textBrowser->append("<font color = \"green\">Dispersion calculation has finished, reloading project<\font>");
+		ui.textBrowser->append("<b color = \"green\">Dispersion calculation has finished, reloading project<\b>");
 		openFileFun(inputFile);
 	}
 	else {
-		ui.textBrowser->append("<font color = \"red\">Dispersion calculation has failed<\font>");
+		ui.textBrowser->append("<b color = \"red\">Dispersion calculation has failed<\b>");
 	}
 }
 

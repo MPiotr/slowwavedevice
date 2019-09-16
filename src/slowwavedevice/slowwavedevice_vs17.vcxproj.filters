@@ -12,6 +12,9 @@
     <ClCompile Include="dispersioncalculatorcontroller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fieldcalculatorcontroller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_aboutDialog.h" />
@@ -35,6 +38,9 @@
     <QtMoc Include="qcustomplot.h" />
     <QtMoc Include="projectviewer.h" />
     <QtMoc Include="dispersioncalculatorcontroller.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="fieldcalculatorcontroller.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

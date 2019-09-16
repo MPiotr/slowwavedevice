@@ -96,6 +96,7 @@
    <addaction name="action"/>
    <addaction name="AbortAction"/>
    <addaction name="CalculateDispersionAction"/>
+   <addaction name="CalculateField"/>
    <addaction name="separator"/>
    <addaction name="OpenAction"/>
    <addaction name="SaveAction"/>
@@ -178,6 +179,18 @@
    </property>
    <property name="toolTip">
     <string>Рассчитывает дисперсию исходя из профиля указанного в periodShape</string>
+   </property>
+  </action>
+  <action name="CalculateField">
+   <property name="icon">
+    <iconset resource="slowwavedevice.qrc">
+     <normaloff>:/slowwavedevice/Resources/forceField.png</normaloff>:/slowwavedevice/Resources/forceField.png</iconset>
+   </property>
+   <property name="text">
+    <string>Расчитать распределение синхронного поля</string>
+   </property>
+   <property name="toolTip">
+    <string>Рассчитывает синхронное распределение поля, для периода в periodShape</string>
    </property>
   </action>
  </widget>
