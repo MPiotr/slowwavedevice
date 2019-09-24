@@ -1,5 +1,6 @@
 #include <filesystem>
 #include "dispersioncalculatorcontroller.h"
+#include <stdio.h>
 
 DispersionCalculatorController::DispersionCalculatorController(projectviewer* project, QTextBrowser* logger, QObject *parent)
 	: proj(project), logBrowser(logger), QObject(parent)
@@ -106,7 +107,8 @@ void DispersionCalculatorController::modeSelectorFinished(int exitCode, QProcess
 	QString filename = proj->getDispersionFileName();
 	if (filename.isEmpty())
 		filename = "dispersion.csv";
-	std::experimental::filesystem::rename("dispersion0.csv", filename.toStdString());
+//	std::experimental::filesystem::rename("dispersion0.csv", filename.toStdString());
+	rename("dispersion0.csv", filename.toLocal8Bit().data());
 	activeProcess = nullptr;
 	emit finished(0);
 

@@ -4,7 +4,7 @@
 #include "device.h"
 #include "multiplier_multimode.h"
 #include "xml_routines.h"
-#include <mkl.h>
+//#include <mkl.h>
 #include "cu_mult.h"
 
 

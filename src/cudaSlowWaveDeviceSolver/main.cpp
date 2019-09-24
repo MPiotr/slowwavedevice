@@ -13,7 +13,7 @@
 #include "Interpolation.h"
 #include "synchronism.h"
 //#include<mpi.h>
-#include<fftw3.h>
+//#include<fftw3.h>
 #include<direct.h>
 #include<time.h>
 #include<sys\timeb.h>
