@@ -8,6 +8,12 @@ DispersionCalculatorController::DispersionCalculatorController(projectviewer* pr
 	resonatorGenerator.setProgram("resonatorGenerator.exe");
 	
 	dispersionCalculator.setProgram("mpiexec");
+
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	QString path = env.value("Path");
+	env.insert("FF_INCLUDEPATH", "C:\\Users\\Piotr\\Documents\\GitHub\\slowwavedevice\\bin\\x64\\Release;");
+
+	dispersionCalculator.setProcessEnvironment(env);
 //    dispersionCalculator.setEnvironment({ "PATH=.:$PATH" });
 	
 
