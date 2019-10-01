@@ -58,7 +58,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	connect(ui.AbortAction, SIGNAL(triggered()), this, SLOT(abortSolver()));
 	connect(ui.action, SIGNAL(triggered()), this, SLOT(start()));
 	connect(ui.CalculateDispersionAction, SIGNAL(triggered()), this, SLOT(calculateDispersion()));
-	connect(ui.CalculateField, SIGNAL(triggered()), this, SLOT(calculateDispersion()));
+	connect(ui.CalculateField, SIGNAL(triggered()), this, SLOT(calculateField()));
 	connect(ui.AboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(&solverProcess, static_cast< void(QProcess::*)(int, QProcess::ExitStatus) > (&QProcess::finished),
 		[=](int exitCode, QProcess::ExitStatus exitStatus){

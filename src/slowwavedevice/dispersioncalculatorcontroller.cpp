@@ -14,7 +14,7 @@ DispersionCalculatorController::DispersionCalculatorController(projectviewer* pr
 	env.insert("FF_INCLUDEPATH", "C:\\Users\\Piotr\\Documents\\GitHub\\slowwavedevice\\bin\\x64\\Release;");
 
 	dispersionCalculator.setProcessEnvironment(env);
-//    dispersionCalculator.setEnvironment({ "PATH=.:$PATH" });
+
 	
 
 	fileMerger.setProgram("file_merger.exe");

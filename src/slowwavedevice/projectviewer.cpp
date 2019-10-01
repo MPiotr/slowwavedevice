@@ -601,11 +601,12 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 	if (!setXMLEntry(&el, "period", &period)) return false;
 
 	double Ltransversal;
-	el = doc.elementsByTagName("FieldCalculation").item(0);
+	el = doc.elementsByTagName("DispersionCalculation").item(0); 
 	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
 
 	double y_beam_center;
-	if (!setXMLEntry(&el, "beamCenterY", &y_beam_center)) return false;
+	el = doc.elementsByTagName("FieldCalculation").item(0); 
+	if (!setXMLEntry(&el, "beamCenterY", &y_beam_center)) y_beam_center = 0;
 
 	bool voltage_defined = true;
 	el = doc.elementsByTagName("solver").item(0);
@@ -626,15 +627,16 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 	setXMLEntry(&doc, "frequency", &freq);
 	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).exists() )
 	{		
-		Synchronism *syncwave = new Synchronism(dispersionFileName, period, freq);
 		if (voltage_defined) { //Calculate h and frequency from voltage
-			freq = syncwave->frequency(voltage);
-			h = syncwave->wavenumber(voltage);
+			Synchronism syncwave(dispersionFileName, period, 0);
+			freq = syncwave.frequency(voltage);
+			h = syncwave.wavenumber(voltage);			
 		}
 		else {   // Frequency is user set, but h need to be calculated
+			Synchronism syncwave(dispersionFileName, period, freq);
 			if (!setXMLEntry(&doc, "frequency", &freq)) return false;
-			syncwave->setFrequency(freq);
-			h = syncwave->wavenumber();			
+			syncwave.setFrequency(freq);
+			h = syncwave.wavenumber();		
 		}
 		
 	}
@@ -643,12 +645,12 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 		double angle;
 		if (!setXMLEntry(&doc, "frequency", &freq)) return false;
 		if (!setXMLEntry(&doc, "angle", &angle)) return false;
-		h = 2.*M_PI / period * angle;		
+		h = angle;		
 	}
 	
 
 	ostringstream result;
-	result << period << " " << Ltransversal << " " << freq << " " << h << " " 
+	result << period << " " << Ltransversal << " " << freq << " " << 2.*M_PI / period * h/360. << " "
 		   << y_beam_center + 0.5*beamHeight << " " << y_beam_center - 0.5*beamHeight << "\n";
 	file->write(result.str().data());
 
