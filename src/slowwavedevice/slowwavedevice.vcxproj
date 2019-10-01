@@ -98,8 +98,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutputPath)$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SOLUTION_DIR)\cudaSlowWaveDeviceSolver\$(PlatformName)$(ConfigurationName);C:\mathgl\mathgl-2.3.4.LGPL-mingw.i386\bin;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>..\cudaSlowWaveDeviceSolver\$(PlatformName)\$(ConfigurationName);$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>synchronism.obj;interpolation.obj;xml_routines.obj;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Qt5WebKitd.lib;Qt5WebkitWidgetsd.lib;Qt5XmlPatternsd.lib;Qt5PrintSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
