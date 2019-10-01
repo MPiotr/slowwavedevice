@@ -49,6 +49,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	whoIsActive = none;
 
 	dispCalcContoller = new DispersionCalculatorController(projmodel, ui.textBrowser, this);
+	fieldCalcController = new FieldCalculatorController(projmodel, ui.textBrowser, this);
 
 	connect(ui.OpenAction, SIGNAL(triggered()), this, SLOT(loadFile()));
 	connect(ui.SaveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
@@ -57,6 +58,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	connect(ui.AbortAction, SIGNAL(triggered()), this, SLOT(abortSolver()));
 	connect(ui.action, SIGNAL(triggered()), this, SLOT(start()));
 	connect(ui.CalculateDispersionAction, SIGNAL(triggered()), this, SLOT(calculateDispersion()));
+	connect(ui.CalculateField, SIGNAL(triggered()), this, SLOT(calculateDispersion()));
 	connect(ui.AboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 	connect(&solverProcess, static_cast< void(QProcess::*)(int, QProcess::ExitStatus) > (&QProcess::finished),
 		[=](int exitCode, QProcess::ExitStatus exitStatus){
@@ -65,6 +67,7 @@ slowwavedevice::slowwavedevice(QWidget *parent)
 	);
 	connect(&solverProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readConsole()));
 	connect(dispCalcContoller, SIGNAL(finished(int)), this, SLOT(dispersionCalcFinished(int)));
+	connect(fieldCalcController, SIGNAL(finished(int)), this, SLOT(dispersionCalcFinished(int)));
 	connect(projmodel, SIGNAL(voltageChanged(QString)), this, SLOT(replotVoltage(QString)));
 	connect(projmodel, SIGNAL(setVisiblePlot(int)), this, SLOT(showPlot(int)));
 	connect(ui.treeView , SIGNAL(clicked(QModelIndex )), projmodel, SLOT(itemClicked(QModelIndex )));
@@ -168,6 +171,13 @@ void slowwavedevice::calculateDispersion()
 	whoIsActive = dispersion;
 }
 
+void slowwavedevice::calculateField()
+{
+	disableButtons();
+	fieldCalcController->calculate();
+	whoIsActive = field;
+}
+
 void slowwavedevice::abortSolver()
 {
 	if (whoIsActive == solver) {
@@ -176,6 +186,9 @@ void slowwavedevice::abortSolver()
 	}
 	if (whoIsActive == dispersion) {
 		dispCalcContoller->abort();
+	}
+	if (whoIsActive == field) {
+		fieldCalcController->abort();
 	}
 	whoIsActive = none;
 	enableButtons(); 
@@ -193,12 +206,13 @@ void slowwavedevice::solverFinished(int exitCode, QProcess::ExitStatus stat)
 void slowwavedevice::dispersionCalcFinished(int exitCode)
 {
 	enableButtons();
+	whoIsActive = none;
 	if (exitCode == 0) {
-		ui.textBrowser->append("<b color = \"green\">Dispersion calculation has finished, reloading project<\b>");
+		ui.textBrowser->append("<b color = \"green\">Calculation has finished, reloading project<\b>");
 		openFileFun(inputFile);
 	}
 	else {
-		ui.textBrowser->append("<b color = \"red\">Dispersion calculation has failed<\b>");
+		ui.textBrowser->append("<b color = \"red\">Calculation has failed<\b>");
 	}
 }
 

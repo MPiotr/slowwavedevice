@@ -32,6 +32,7 @@ public:
 	void recalculatePeriodFromShape(QTextBrowser *browser);
 
 	bool savePeriodParamsForDispersionCalculation(QFile* file) const;
+	bool savePeriodParamsForFieldCalculation(QFile * file);
 	bool getShapeFileName(QString *name);
 	int  getNumCores();
 	double getPeriod();

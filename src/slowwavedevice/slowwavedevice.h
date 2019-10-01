@@ -9,6 +9,7 @@
 #include <qbuffer.h>
 #include "projectviewer.h"
 #include "dispersioncalculatorcontroller.h"
+#include "fieldcalculatorcontroller.h"
 
 #include "ui_slowwavedevice.h"
 #include "ui_aboutDialog.h"
@@ -22,7 +23,7 @@ public:
 	~slowwavedevice();
 
 private:
-	enum activeProcess  { none,  solver, dispersion };
+	enum activeProcess  { none,  solver, dispersion, field };
 	Ui::slowwavedeviceClass ui;
 	Ui::Dialog about;
 
@@ -68,6 +69,8 @@ private:
 	void updateResultPlot(int Npoints);
 
 	DispersionCalculatorController *dispCalcContoller;
+	FieldCalculatorController *fieldCalcController;
+	
 	activeProcess whoIsActive;
 
 signals:
@@ -90,6 +93,7 @@ private slots:
 	void readConsole();
 	void showAbout();
 	void calculateDispersion();
+	void calculateField();
 };
 
 #endif // SLOWWAVEDEVICE_H

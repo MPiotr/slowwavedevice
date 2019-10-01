@@ -594,6 +594,67 @@ bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file) const
 	return true;
 }
 
+bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file) 
+{
+	double period = 0;
+	QDomNode el = doc.elementsByTagName("LFsection").item(0);
+	if (!setXMLEntry(&el, "period", &period)) return false;
+
+	double Ltransversal;
+	el = doc.elementsByTagName("FieldCalculation").item(0);
+	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
+
+	double y_beam_center;
+	if (!setXMLEntry(&el, "beamCenterY", &y_beam_center)) return false;
+
+	bool voltage_defined = true;
+	el = doc.elementsByTagName("solver").item(0);
+	char problemType[30];
+	if (setXMLEntry(&el, "problemType", problemType))
+		if (strcmp(problemType, "twt") == 0) 
+			voltage_defined = false;
+
+	el = doc.elementsByTagName("beam").item(0);
+	double beamHeight;
+	double voltage;
+	if (!setXMLEntry(&el, "beamHeight", &beamHeight)) return false;
+	if (!setXMLEntry(&el, "voltage", &voltage)) return false;
+
+	
+	char dispersionFileName[200] = "";
+	double freq, h;
+	setXMLEntry(&doc, "frequency", &freq);
+	if (setXMLEntry(&doc, "dispersionFileName", dispersionFileName) && QFile(QString(dispersionFileName)).exists() )
+	{		
+		Synchronism *syncwave = new Synchronism(dispersionFileName, period, freq);
+		if (voltage_defined) { //Calculate h and frequency from voltage
+			freq = syncwave->frequency(voltage);
+			h = syncwave->wavenumber(voltage);
+		}
+		else {   // Frequency is user set, but h need to be calculated
+			if (!setXMLEntry(&doc, "frequency", &freq)) return false;
+			syncwave->setFrequency(freq);
+			h = syncwave->wavenumber();			
+		}
+		
+	}
+	else
+	{
+		double angle;
+		if (!setXMLEntry(&doc, "frequency", &freq)) return false;
+		if (!setXMLEntry(&doc, "angle", &angle)) return false;
+		h = 2.*M_PI / period * angle;		
+	}
+	
+
+	ostringstream result;
+	result << period << " " << Ltransversal << " " << freq << " " << h << " " 
+		   << y_beam_center + 0.5*beamHeight << " " << y_beam_center - 0.5*beamHeight << "\n";
+	file->write(result.str().data());
+
+	return true;
+}
+
 int projectviewer::getNumCores() 
 {
 	int numCores;
