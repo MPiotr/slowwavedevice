@@ -38,6 +38,7 @@ public:
 	double getPeriod();
 	double getRefFreq();
 	QString getDispersionFileName();
+	QString getFieldFileName();
 
 
 	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);

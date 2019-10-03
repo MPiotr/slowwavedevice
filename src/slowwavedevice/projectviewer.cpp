@@ -189,20 +189,20 @@ void projectviewer::itemClicked(QModelIndex  index)
 			parname == "voltage" || name == "voltage") emit setVisiblePlot(0);
 		if (parname == "longitudinalStructureFile"	|| parname == "fieldFileName" || parname == "QStructureFile") 
 		{
-			setPlot(plotArea, parname.toLocal8Bit().data(), 50, nullptr);
+			setPlot(plotArea, parname.toLocal8Bit().data(), 50, debugBrowser);
 			emit setVisiblePlot(1);
 		}
 		if (name == "longitudinalStructureFile"||  name == "fieldFileName"|| name == "QStructureFile")
 		{
-			setPlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
+			setPlot(plotArea, name.toLocal8Bit().data(), 50, debugBrowser);
 			emit setVisiblePlot(1);
 		}
 		if (name == "periodShape") {
-			setTablePlot(plotArea, name.toLocal8Bit().data(), 50, nullptr);
+			setTablePlot(plotArea, name.toLocal8Bit().data(), 50, debugBrowser);
 			emit setVisiblePlot(1);
 		}
 		if (parname == "periodShape") {
-			setTablePlot(plotArea, parname.toLocal8Bit().data(), 50, nullptr);
+			setTablePlot(plotArea, parname.toLocal8Bit().data(), 50, debugBrowser);
 			emit setVisiblePlot(1);
 		}
 		
@@ -567,6 +567,15 @@ QString projectviewer::getDispersionFileName()
 	return QString();
 }
 
+QString projectviewer::getFieldFileName()
+{
+	char filename[300];
+	if (setXMLEntry(&doc, "fieldFileName", filename))
+		return QString(filename);
+
+	return QString();
+}
+
 bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file) const
 {
 	double period = 0;
@@ -605,8 +614,10 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
 
 	double y_beam_center;
+	int Ny = 16;
 	el = doc.elementsByTagName("FieldCalculation").item(0); 
 	if (!setXMLEntry(&el, "beamCenterY", &y_beam_center)) y_beam_center = 0;
+	if (!setXMLEntry(&el, "Ny", &Ny)) Ny = 16;
 
 	bool voltage_defined = true;
 	el = doc.elementsByTagName("solver").item(0);
@@ -651,7 +662,7 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 
 	ostringstream result;
 	result << period << " " << Ltransversal << " " << freq << " " << 2.*M_PI / period * h/360. << " "
-		   << y_beam_center + 0.5*beamHeight << " " << y_beam_center - 0.5*beamHeight << "\n";
+		   << y_beam_center + 0.5*beamHeight << " " << y_beam_center - 0.5*beamHeight <<" "<< Ny << "\n";
 	file->write(result.str().data());
 
 	return true;

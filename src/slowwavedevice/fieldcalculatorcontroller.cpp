@@ -7,13 +7,14 @@ FieldCalculatorController::FieldCalculatorController(projectviewer * project, QT
 
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	QString path = env.value("Path");
-	env.insert("FF_INCLUDEPATH", "C:\\Users\\Piotr\\Documents\\GitHub\\slowwavedevice\\bin\\x64\\Release;");
+	env.insert("FF_INCLUDEPATH", QCoreApplication::applicationDirPath()+";");
 
 	fieldCalculator.setProcessEnvironment(env);
 
 	connect(&fieldCalculator, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)> (&QProcess::finished),
 		[=](int exitCode, QProcess::ExitStatus exitStatus) { processFinished(exitCode, exitStatus); }
 	);
+	connect(&fieldCalculator, SIGNAL(readyReadStandardOutput()), this, SLOT(readConsole()));
 }
 
 void FieldCalculatorController::calculate()
@@ -43,6 +44,13 @@ void FieldCalculatorController::processFinished(int exitCode, QProcess::ExitStat
 {
 	logBrowser->append(fieldCalculator.readAllStandardOutput());
 	if (exitCode != 0) { errorExit(QString("exit code is not zero"));	return; }
+
+	QString filename = proj->getFieldFileName();
+	if (filename.isEmpty())
+		filename = "tfield.csv";
+	//	std::experimental::filesystem::rename("dispersion0.csv", filename.toStdString());
+	rename("tFieldFem.csv", filename.toLocal8Bit().data());
+
 	emit finished(0);
 }
 
