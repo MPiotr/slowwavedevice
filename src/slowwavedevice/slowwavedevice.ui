@@ -14,8 +14,8 @@
    <string>slowwavedevice</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>Resources/icon.png</normaloff>Resources/icon.png</iconset>
+   <iconset resource="slowwavedevice.qrc">
+    <normaloff>:/slowwavedevice/Resources/icon.ico</normaloff>:/slowwavedevice/Resources/icon.ico</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>false</bool>
@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>804</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

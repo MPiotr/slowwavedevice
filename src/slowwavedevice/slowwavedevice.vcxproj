@@ -312,7 +312,6 @@
     </CustomBuild>
     <ClInclude Include="GeneratedFiles\ui_aboutDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_slowwavedevice.h" />
-    <ClInclude Include="resource.h" />
     <CustomBuild Include="resultreadyevent.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </Message>
@@ -441,9 +440,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="slowwavedevice.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="aboutDialog.ui">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
@@ -467,6 +463,12 @@
     <Xml Include="helpInfo.xml">
       <SubType>Designer</SubType>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="slowwavedevice.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

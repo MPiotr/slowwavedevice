@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/slowwavedevice">
+    <file>Resources/icon.ico</file>
     <file>Resources/148705-essential-collection/png/save.png</file>
     <file>Resources/forceField.png</file>
     <file>Resources/saveas.png</file>
