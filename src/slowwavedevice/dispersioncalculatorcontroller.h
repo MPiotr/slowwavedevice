@@ -19,6 +19,7 @@ private:
 
 	projectviewer *proj;
 	void errorExit(QString &message);
+	bool getFemScriptName(QString &scriptName);
 
 private slots:
 	

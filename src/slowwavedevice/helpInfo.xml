@@ -40,6 +40,12 @@
     <logitudinalStructureFile type="filename" usage="optionally" unit="mm">Продольный профиль синхронной гармоник</logitudinalStructureFile>
 	<magneticField usage ="optionally,TWT_1D,TWT_0D" unit ="T">Величина магнитного поля в Теслах</magneticField>
 	<maxTransversalBeta usage = "optionally,TWT_1D,TWT_0D" unit="none">Величина максимальной поперечной скорости (нормированная на скорость света)</maxTransversalBeta>
+     <DispersionCalculation usage="optionally">
+       <shapeType type="fixedOptions">Тип структуры<option value="planar"/><option value="axial"/></shapeType>
+       <structureWidthOrAzimuthIndex unit="mm">Ширина структуры или азимутальный индекс, которые будут использованы при вычислении дисперсионки и синхронного поля</structureWidthOrAzimuthIndex>
+       <referenceFrequencyForDispersion unit="GHz">Частота к которой близка частота искомой моды при h=0</referenceFrequencyForDispersion>
+       <numCores>Количество ядер, которые будут использованы при вычислении дисперсионки</numCores>
+     </DispersionCalculation>
    </LFsection>
   </cavity>
   <solver>

@@ -31,7 +31,7 @@ public:
 	QDomDocument toolTipsXML;
 	void recalculatePeriodFromShape(QTextBrowser *browser);
 
-	bool savePeriodParamsForDispersionCalculation(QFile* file) const;
+	bool savePeriodParamsForDispersionCalculation(QFile* file);
 	bool savePeriodParamsForFieldCalculation(QFile * file);
 	bool getShapeFileName(QString *name);
 	int  getNumCores();
@@ -39,6 +39,8 @@ public:
 	double getRefFreq();
 	QString getDispersionFileName();
 	QString getFieldFileName();
+	QString getShapeType();
+	bool getLtransversalOrM(double &Ltransversal);
 
 
 	static bool openHelperXML(QDomDocument *out, QString *err_msg, int *err_line, int *err_column);

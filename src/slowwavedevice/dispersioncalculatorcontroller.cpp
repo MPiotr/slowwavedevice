@@ -64,8 +64,6 @@ void DispersionCalculatorController::calculate()
 	logBrowser->append(resonatorGenerator.readAllStandardOutput());	
 }
 
-
-
 void DispersionCalculatorController::resonatorGeneratorFinished(int exitCode, QProcess::ExitStatus stat) 
 {
 	if (exitCode != 0) { errorExit(QString("resonatorGenerator exit code is not zero"));	return; }
@@ -76,7 +74,11 @@ void DispersionCalculatorController::resonatorGeneratorFinished(int exitCode, QP
 	output.close();
 
 	int numCores = proj->getNumCores();
-	dispersionCalculator.setArguments({ "-n", QString::number(numCores), "FreeFem++-mpi" ,"dispersionCalculator.edp" });
+
+	QString scriptName;
+	if (!getFemScriptName(scriptName)) return;
+
+	dispersionCalculator.setArguments({ "-n", QString::number(numCores), "FreeFem++-mpi" , scriptName });
 	dispersionCalculator.start();
 	activeProcess = &dispersionCalculator;
 }
@@ -124,6 +126,18 @@ void DispersionCalculatorController::readConsole()
 {
 	logBrowser->append(activeProcess->readAllStandardOutput());
 }
+
+bool DispersionCalculatorController::getFemScriptName(QString &scriptName) {
+	QString shapeType = proj->getShapeType();
+	if (shapeType.isEmpty()) { errorExit(QString("shapeType is not specified")); return false; }
+	if (shapeType != "planar" && shapeType != "axial") { errorExit(QString("shapeType is not recognized")); return false; }
+
+	if (shapeType == "planar") scriptName = "dispersionCalculator.edp";
+	if (shapeType == "axial") scriptName = "dispersionCalculatorAxial.edp";
+	return true;
+}
+
+
 void DispersionCalculatorController::errorExit(QString & message)
 {
 	logBrowser->append("<b><font color = \"red\">Error: </font></b>" + message);

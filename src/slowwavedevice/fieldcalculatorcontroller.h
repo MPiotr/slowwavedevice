@@ -15,6 +15,7 @@ class FieldCalculatorController : public QObject
 	projectviewer *proj;
 
 	void errorExit(QString & message);
+	bool getFemScriptName(QString & scriptName);
 
 public:
 	FieldCalculatorController(projectviewer* project, QTextBrowser *loggerBrowser, QObject *parent);

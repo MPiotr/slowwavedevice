@@ -17,9 +17,21 @@ FieldCalculatorController::FieldCalculatorController(projectviewer * project, QT
 	connect(&fieldCalculator, SIGNAL(readyReadStandardOutput()), this, SLOT(readConsole()));
 }
 
+bool FieldCalculatorController::getFemScriptName(QString &scriptName) {
+	QString shapeType = proj->getShapeType();
+	if (shapeType.isEmpty()) { errorExit(QString("shapeType is not specified")); return false; }
+	if (shapeType != "planar" && shapeType != "axial") { errorExit(QString("shapeType is not recognized")); return false; }
+
+	if (shapeType == "planar") scriptName = "fieldCalculator.edp";
+	if (shapeType == "axial") scriptName = "fieldCalculatorAxial.edp";
+	return true;
+}
+
 void FieldCalculatorController::calculate()
 {
-	fieldCalculator.setArguments({ "fieldCalculator.edp" });
+	QString scriptName;
+	if(!getFemScriptName(scriptName)) return;
+	fieldCalculator.setArguments({ scriptName });
 
 	QFile output("field_param.txt");
 	if (!output.open(QIODevice::WriteOnly)) { errorExit(QString("can't open 'param.txt' for writing"));	return; }

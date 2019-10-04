@@ -576,18 +576,54 @@ QString projectviewer::getFieldFileName()
 	return QString();
 }
 
-bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file) const
+QString projectviewer::getShapeType() 
+{
+	char shapeType[300];
+	if (setXMLEntry(&doc, "shapeType", shapeType))
+		return QString(shapeType);
+
+	return QString();
+}
+
+bool projectviewer::getLtransversalOrM(double &Ltransversal) {
+	QString shapeType = getShapeType();
+	if (shapeType.isEmpty() || (shapeType != "planar" && shapeType != "axial"))
+	{
+		debugBrowser->append("shapeType is not specified or not recognized");
+		return false;
+	}
+
+	auto el = doc.elementsByTagName("DispersionCalculation").item(0);
+
+	if (!setXMLEntry(&el, "structureWidthOrAzimuthIndex", &Ltransversal))
+	{
+		debugBrowser->append("structureWidthOrAzimuthIndex is not found"); 
+		return false;
+	}
+
+	return true;
+
+}
+
+bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file) 
 {
 	double period = 0;
 	QDomNode el = doc.elementsByTagName("LFsection").item(0);
-	if (!setXMLEntry(&el, "period", &period)) return false;
+	if (!setXMLEntry(&el, "period", &period)) 
+	{   debugBrowser->append("period is not foune"); return false; }
+
+	QString shapeType = getShapeType();
+	if (shapeType.isEmpty() || (shapeType != "planar" && shapeType != "axial"))
+	{   debugBrowser->append("shapeType is not specified or not recognized"); return false; }
 
 	double Ltransversal;
+	if (!getLtransversalOrM(Ltransversal)) 
+		return false;
+
 	el = doc.elementsByTagName("DispersionCalculation").item(0);
-	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
-	
 	double refFreq;
-	if (!setXMLEntry(&el, "referenceFrequencyForDispersion", &refFreq)) return false;
+	if (!setXMLEntry(&el, "referenceFrequencyForDispersion", &refFreq))
+	{	debugBrowser->append("referenceFrequencyForDispersion is not found");return false;	}
 
 	double maxH;
 	if (!setXMLEntry(&el, "maximumHForDispersion", &maxH)) maxH = 4;
@@ -610,8 +646,8 @@ bool projectviewer::savePeriodParamsForFieldCalculation(QFile * file)
 	if (!setXMLEntry(&el, "period", &period)) return false;
 
 	double Ltransversal;
-	el = doc.elementsByTagName("DispersionCalculation").item(0); 
-	if (!setXMLEntry(&el, "structureWidthForDisperion", &Ltransversal)) return false;
+	if (!getLtransversalOrM(Ltransversal))
+		return false;
 
 	double y_beam_center;
 	int Ny = 16;
