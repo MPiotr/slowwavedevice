@@ -116,6 +116,7 @@ void DispersionCalculatorController::modeSelectorFinished(int exitCode, QProcess
 	if (filename.isEmpty())
 		filename = "dispersion.csv";
 //	std::experimental::filesystem::rename("dispersion0.csv", filename.toStdString());
+	remove(filename.toLocal8Bit().data());
 	rename("dispersion0.csv", filename.toLocal8Bit().data());
 	activeProcess = nullptr;
 	emit finished(0);

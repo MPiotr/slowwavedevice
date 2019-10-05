@@ -61,7 +61,9 @@ void FieldCalculatorController::processFinished(int exitCode, QProcess::ExitStat
 	if (filename.isEmpty())
 		filename = "tfield.csv";
 	//	std::experimental::filesystem::rename("dispersion0.csv", filename.toStdString());
-	rename("tFieldFem.csv", filename.toLocal8Bit().data());
+
+	remove(filename.toLocal8Bit().data());
+	int renres = rename("tFieldFem.csv", filename.toLocal8Bit().data());
 
 	emit finished(0);
 }
