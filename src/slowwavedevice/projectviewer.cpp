@@ -610,7 +610,7 @@ bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file)
 	double period = 0;
 	QDomNode el = doc.elementsByTagName("LFsection").item(0);
 	if (!setXMLEntry(&el, "period", &period)) 
-	{   debugBrowser->append("period is not foune"); return false; }
+	{   debugBrowser->append("period is not found"); return false; }
 
 	QString shapeType = getShapeType();
 	if (shapeType.isEmpty() || (shapeType != "planar" && shapeType != "axial"))
@@ -625,11 +625,13 @@ bool projectviewer::savePeriodParamsForDispersionCalculation(QFile * file)
 	if (!setXMLEntry(&el, "referenceFrequencyForDispersion", &refFreq))
 	{	debugBrowser->append("referenceFrequencyForDispersion is not found");return false;	}
 
-	double maxH;
-	if (!setXMLEntry(&el, "maximumHForDispersion", &maxH)) maxH = 4;
+	double maxH = 4;
+	if (!setXMLEntry(&el, "maximumHForDispersion", &maxH)) 
+	{ debugBrowser->append("maximumHForDispersion is not specified, use default value = 4"); 	 }
 
-	double densH;
-	if (!setXMLEntry(&el, "densityHForDispersion", &densH)) densH = 33;
+	double densH = 33;
+	if (!setXMLEntry(&el, "densityHForDispersion", &densH)) 
+	{ debugBrowser->append("densityHForDispersion is not specified, use default value = 33"); 	 }
 
 
 	ostringstream result;
